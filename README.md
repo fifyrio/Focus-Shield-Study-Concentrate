@@ -1,2 +1,5 @@
-# Focus-Shield-Study-Concentrate
-Focus Shield: Study &amp; Concentrate
+## iOS 项目目录
+
+```
+./codes/focusSheid
+```
