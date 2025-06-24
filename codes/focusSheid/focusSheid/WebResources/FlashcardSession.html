@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcard Session - Focus Shield</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 60px 20px 20px;
+            color: white;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .deck-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .progress-info {
+            text-align: right;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .progress-container {
+            margin-top: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            width: 33%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .flashcard-container {
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 60vh;
+        }
+
+        .flashcard {
+            width: 100%;
+            max-width: 320px;
+            height: 300px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flashcard::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .flashcard:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-content {
+            font-size: 18px;
+            line-height: 1.5;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .question {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .answer-section {
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.correct {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .feedback.incorrect {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .card-navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: #667eea;
+            transform: scale(1.2);
+        }
+
+        .completion-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            max-width: 300px;
+            margin: 0 20px;
+        }
+
+        .modal-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .modal-text {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .floating-hint {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            color: #667eea;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            z-index: 99;
+        }
+
+        .floating-hint:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <button class="back-btn" onclick="history.back()">←</button>
+                <div class="deck-title">My First Deck</div>
+                <div class="progress-info">1/3</div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="progress-text">Question 1 of 3</div>
+            </div>
+        </header>
+
+        <div class="flashcard-container">
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+                <div class="card-content">
+                    <div class="question">What is the capital of France?</div>
+                    <div class="hint">💡 Think of the city of lights...</div>
+                </div>
+            </div>
+
+            <div class="answer-section">
+                <input type="text" class="answer-input" placeholder="Type your answer here..." id="answerInput">
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="checkAnswer()">Submit Answer</button>
+                    <button class="btn btn-secondary" onclick="showHint()">Hint</button>
+                </div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+        </div>
+
+        <div class="card-navigation">
+            <div class="nav-dot active"></div>
+            <div class="nav-dot"></div>
+            <div class="nav-dot"></div>
+        </div>
+
+        <button class="floating-hint" onclick="showHint()" title="Get a hint">💡</button>
+
+        <div class="completion-modal" id="completionModal">
+            <div class="modal-content">
+                <div class="modal-icon">🎉</div>
+                <div class="modal-title">Congratulations!</div>
+                <div class="modal-text">You've completed this flashcard session. Your apps are now unlocked!</div>
+                <button class="btn btn-primary" onclick="completeSession()">Return to Shield</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCard = 1;
+        let totalCards = 3;
+        let correctAnswers = 0;
+        let isFlipped = false;
+
+        const questions = [
+            {
+                question: "What is the capital of France?",
+                answer: "Paris",
+                hint: "Think of the city of lights and the Eiffel Tower..."
+            },
+            {
+                question: "What is 2 + 2?",
+                answer: "4",
+                hint: "It's a basic addition problem..."
+            },
+            {
+                question: "What color do you get when you mix red and blue?",
+                answer: "Purple",
+                hint: "Think about primary and secondary colors..."
+            }
+        ];
+
+        function flipCard() {
+            const card = document.getElementById('flashcard');
+            card.classList.toggle('flipped');
+            isFlipped = !isFlipped;
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answerInput').value.trim().toLowerCase();
+            const correctAnswer = questions[currentCard - 1].answer.toLowerCase();
+            const feedback = document.getElementById('feedback');
+
+            if (userAnswer === correctAnswer) {
+                feedback.textContent = "Correct! Well done! 🎉";
+                feedback.className = "feedback correct show";
+                correctAnswers++;
+                setTimeout(nextCard, 2000);
+            } else {
+                feedback.textContent = `Incorrect. The answer is: ${questions[currentCard - 1].answer}`;
+                feedback.className = "feedback incorrect show";
+                setTimeout(nextCard, 3000);
+            }
+        }
+
+        function nextCard() {
+            if (currentCard < totalCards) {
+                currentCard++;
+                loadCard();
+                updateProgress();
+            } else {
+                showCompletionModal();
+            }
+        }
+
+        function loadCard() {
+            const question = questions[currentCard - 1];
+            document.querySelector('.question').textContent = question.question;
+            document.querySelector('.hint').textContent = `💡 ${question.hint}`;
+            document.getElementById('answerInput').value = '';
+            document.getElementById('feedback').className = 'feedback';
+            
+            // Update navigation dots
+            document.querySelectorAll('.nav-dot').forEach((dot, index) => {
+                dot.className = index === currentCard - 1 ? 'nav-dot active' : 'nav-dot';
+            });
+        }
+
+        function updateProgress() {
+            const progress = (currentCard / totalCards) * 100;
+            document.querySelector('.progress-fill').style.width = progress + '%';
+            document.querySelector('.progress-info').textContent = `${currentCard}/${totalCards}`;
+            document.querySelector('.progress-text').textContent = `Question ${currentCard} of ${totalCards}`;
+        }
+
+        function showHint() {
+            const hint = questions[currentCard - 1].hint;
+            alert(`Hint: ${hint}`);
+        }
+
+        function showCompletionModal() {
+            document.getElementById('completionModal').style.display = 'flex';
+        }
+
+        function completeSession() {
+            // In a real app, this would unlock the blocked apps
+            alert(`Session completed! You got ${correctAnswers}/${totalCards} correct.`);
+            window.location.href = 'Shield.html';
+        }
+
+        // Handle enter key for answer input
+        document.getElementById('answerInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        // Add card swipe gestures (simplified)
+        let startX = 0;
+        let startY = 0;
+
+        document.getElementById('flashcard').addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+
+        document.getElementById('flashcard').addEventListener('touchend', function(e) {
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            const diffX = startX - endX;
+            const diffY = startY - endY;
+
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                if (diffX > 0 && currentCard < totalCards) {
+                    // Swipe left - next card
+                    nextCard();
+                } else if (diffX < 0 && currentCard > 1) {
+                    // Swipe right - previous card (if implemented)
+                    // previousCard();
+                }
+            }
+        });
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html> 

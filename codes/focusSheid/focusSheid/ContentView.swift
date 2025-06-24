@@ -1,21 +1,21 @@
-//
-//  ContentView.swift
-//  focusSheid
-//
-//  Created by 吴伟 on 6/24/25.
-//
-
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationStack {
+            List {
+                NavigationLink("Decks") { DecksView() }
+                NavigationLink("Flashcard Session") { FlashcardSessionView() }
+                NavigationLink("Help") { HelpView() }
+                NavigationLink("Privacy") { PrivacyView() }
+                NavigationLink("Profile") { ProfileView() }
+                NavigationLink("Shield") { ShieldView() }
+                NavigationLink("Stats") { StatsView() }
+                NavigationLink("Terms") { TermsView() }
+                NavigationLink("Upgrade") { UpgradeView() }
+            }
+            .navigationTitle("Focus Shield")
         }
-        .padding()
     }
 }
 

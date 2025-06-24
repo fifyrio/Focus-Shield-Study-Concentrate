@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upgrade to Pro - Focus Shield</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 60px 20px 30px;
+            color: white;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 30px 20px;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .features-list {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            margin-right: 15px;
+        }
+
+        .feature-content {
+            flex: 1;
+        }
+
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .pricing-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 30px;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card::before {
+            content: '✨';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+            50% { opacity: 0.7; transform: scale(1.2) rotate(180deg); }
+        }
+
+        .pricing-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .pricing-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .pricing-price {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .pricing-period {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .upgrade-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .upgrade-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .trial-text {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .comparison-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .comparison-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .comparison-table {
+            width: 100%;
+        }
+
+        .comparison-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .comparison-row:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-feature {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .comparison-free {
+            color: #f44336;
+            font-size: 18px;
+        }
+
+        .comparison-pro {
+            color: #4CAF50;
+            font-size: 18px;
+        }
+
+        .footer-text {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            line-height: 1.5;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <button class="back-btn" onclick="history.back()">←</button>
+                <h1>Upgrade to Pro</h1>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="hero-section">
+                <div class="hero-icon">🚀</div>
+                <div class="hero-title">Unlock Your Full Potential</div>
+                <div class="hero-subtitle">Get unlimited access to all premium features and supercharge your focus journey</div>
+            </div>
+
+            <div class="features-list">
+                <div class="feature-item">
+                    <div class="feature-icon">∞</div>
+                    <div class="feature-content">
+                        <div class="feature-title">Unlimited Decks</div>
+                        <div class="feature-desc">Create as many flashcard decks as you need</div>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-content">
+                        <div class="feature-title">Advanced Analytics</div>
+                        <div class="feature-desc">Detailed insights into your study patterns</div>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔒</div>
+                    <div class="feature-content">
+                        <div class="feature-title">Custom App Blocking</div>
+                        <div class="feature-desc">Block any app or website you choose</div>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎨</div>
+                    <div class="feature-content">
+                        <div class="feature-title">Premium Themes</div>
+                        <div class="feature-desc">Beautiful themes to personalize your experience</div>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">☁️</div>
+                    <div class="feature-content">
+                        <div class="feature-title">Cloud Sync</div>
+                        <div class="feature-desc">Sync your data across all devices</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pricing-card">
+                <div class="pricing-badge">MOST POPULAR</div>
+                <div class="pricing-title">Focus Shield Pro</div>
+                <div class="pricing-price">$4.99</div>
+                <div class="pricing-period">per month</div>
+                <button class="upgrade-btn" onclick="purchasePro()">Start Free Trial</button>
+                <div class="trial-text">7 days free, then $4.99/month</div>
+            </div>
+
+            <div class="comparison-section">
+                <div class="comparison-title">Free vs Pro</div>
+                <div class="comparison-table">
+                    <div class="comparison-row">
+                        <div class="comparison-feature">Flashcard Decks</div>
+                        <div class="comparison-free">3</div>
+                        <div class="comparison-pro">∞</div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-feature">Blocked Apps</div>
+                        <div class="comparison-free">5</div>
+                        <div class="comparison-pro">∞</div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-feature">Analytics</div>
+                        <div class="comparison-free">✗</div>
+                        <div class="comparison-pro">✓</div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-feature">Cloud Sync</div>
+                        <div class="comparison-free">✗</div>
+                        <div class="comparison-pro">✓</div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-feature">Premium Support</div>
+                        <div class="comparison-free">✗</div>
+                        <div class="comparison-pro">✓</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-text">
+                Cancel anytime. No commitments.<br>
+                Your subscription will auto-renew unless cancelled.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function purchasePro() {
+            alert('Redirecting to payment... In a real app, this would integrate with App Store or payment processor.');
+            // In a real app, this would integrate with payment system
+        }
+
+        // Add entrance animations
+        window.addEventListener('load', function() {
+            const elements = document.querySelectorAll('.feature-item, .pricing-card, .comparison-row');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 0.5s ease';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html> 
