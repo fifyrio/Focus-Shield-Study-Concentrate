@@ -5,7 +5,7 @@ struct ContentView: View {
         NavigationStack {
             List {
                 NavigationLink("Decks") { DecksView() }
-                NavigationLink("Flashcard Session") { FlashcardSessionView() }
+                NavigationLink("Flashcard Session") { FlashcardSessionView(deck: Deck(title: "Sample", totalCards: 3, mastered: 0)) }
                 NavigationLink("Help") { HelpView() }
                 NavigationLink("Privacy") { PrivacyView() }
                 NavigationLink("Profile") { ProfileView() }
