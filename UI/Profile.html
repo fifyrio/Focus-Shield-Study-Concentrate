@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Focus Shield</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 60px 20px 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="30" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="20" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="60" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .content {
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            margin: -20px 0 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            margin: 0 auto 15px;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .profile-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .profile-status {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .stats-mini {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-mini {
+            text-align: center;
+        }
+
+        .stat-mini-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-mini-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .section {
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:hover {
+            background: #f8f9fa;
+            transform: translateX(5px);
+        }
+
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 15px;
+            color: white;
+        }
+
+        .menu-icon.upgrade { background: linear-gradient(135deg, #FF6B6B, #FF8E8E); }
+        .menu-icon.follow { background: linear-gradient(135deg, #4ECDC4, #44A08D); }
+        .menu-icon.help { background: linear-gradient(135deg, #45B7D1, #96C93D); }
+        .menu-icon.privacy { background: linear-gradient(135deg, #F093FB, #F5576C); }
+        .menu-icon.terms { background: linear-gradient(135deg, #4FACFE, #00F2FE); }
+
+        .menu-content {
+            flex: 1;
+        }
+
+        .menu-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .menu-subtitle {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .menu-arrow {
+            color: #ccc;
+            font-size: 18px;
+        }
+
+        .upgrade-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upgrade-banner::before {
+            content: '✨';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        .upgrade-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .upgrade-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .upgrade-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upgrade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 375px;
+            background: white;
+            padding: 15px 0 25px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>Profile</h1>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="profile-card">
+                <div class="avatar">👤</div>
+                <div class="profile-name">Focus User</div>
+                <div class="profile-status">Free Plan</div>
+                <div class="stats-mini">
+                    <div class="stat-mini">
+                        <div class="stat-mini-number">2</div>
+                        <div class="stat-mini-label">Decks</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-number">2</div>
+                        <div class="stat-mini-label">Cards</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-number">2</div>
+                        <div class="stat-mini-label">To Unlock</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="upgrade-banner">
+                <div class="upgrade-title">Upgrade to Pro</div>
+                <div class="upgrade-subtitle">Unlock unlimited decks and premium features</div>
+                <button class="upgrade-btn" onclick="location.href='Upgrade.html'">Get Pro</button>
+            </div>
+
+            <div class="section">
+                <div class="section-header">Purchase</div>
+                <a href="Upgrade.html" class="menu-item">
+                    <div class="menu-icon upgrade">⭐</div>
+                    <div class="menu-content">
+                        <div class="menu-title">Upgrade to Pro</div>
+                        <div class="menu-subtitle">Unlock premium features</div>
+                    </div>
+                    <div class="menu-arrow">›</div>
+                </a>
+            </div>
+
+            <div class="section">
+                <div class="section-header">General</div>
+                <a href="Help.html" class="menu-item">
+                    <div class="menu-icon follow">🐦</div>
+                    <div class="menu-content">
+                        <div class="menu-title">Follow us on X</div>
+                        <div class="menu-subtitle">Stay updated with latest features</div>
+                    </div>
+                    <div class="menu-arrow">›</div>
+                </a>
+                <a href="Help.html" class="menu-item">
+                    <div class="menu-icon help">❓</div>
+                    <div class="menu-content">
+                        <div class="menu-title">Help Center</div>
+                        <div class="menu-subtitle">Get support and answers</div>
+                    </div>
+                    <div class="menu-arrow">›</div>
+                </a>
+                <a href="Privacy.html" class="menu-item">
+                    <div class="menu-icon privacy">🔐</div>
+                    <div class="menu-content">
+                        <div class="menu-title">Privacy Policy</div>
+                        <div class="menu-subtitle">How we protect your data</div>
+                    </div>
+                    <div class="menu-arrow">›</div>
+                </a>
+                <a href="Terms.html" class="menu-item">
+                    <div class="menu-icon terms">📋</div>
+                    <div class="menu-content">
+                        <div class="menu-title">Term of Use</div>
+                        <div class="menu-subtitle">Terms and conditions</div>
+                    </div>
+                    <div class="menu-arrow">›</div>
+                </a>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <a href="Shield.html" class="nav-item">
+                <div class="nav-icon">🛡️</div>
+                <div class="nav-label">Shield</div>
+            </a>
+            <a href="Decks.html" class="nav-item">
+                <div class="nav-icon">📚</div>
+                <div class="nav-label">Decks</div>
+            </a>
+            <a href="Stats.html" class="nav-item">
+                <div class="nav-icon">📊</div>
+                <div class="nav-label">Stats</div>
+            </a>
+            <a href="Profile.html" class="nav-item active">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Profile</div>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // Add interactive animations
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(8px)';
+                this.querySelector('.menu-arrow').style.transform = 'translateX(5px)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+                this.querySelector('.menu-arrow').style.transform = 'translateX(0)';
+            });
+        });
+
+        // Animate stats on load
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.stat-mini-number').forEach(el => {
+                const target = parseInt(el.textContent);
+                el.textContent = '0';
+                let current = 0;
+                const increment = target / 10;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    el.textContent = Math.floor(current);
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html> 
