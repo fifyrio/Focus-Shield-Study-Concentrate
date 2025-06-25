@@ -1,21 +1,33 @@
-//
-//  ContentView.swift
-//  focusSheid
-//
-//  Created by 吴伟 on 6/24/25.
-//
-
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView {
+            NavigationStack { ShieldView() }
+                .tabItem {
+                    Image(systemName: "shield.lefthalf.fill")
+                    Text("Shield")
+                }
+
+            NavigationStack { DecksView() }
+                .tabItem {
+                    Image(systemName: "books.vertical")
+                    Text("Decks")
+                }
+
+            NavigationStack { StatsView() }
+                .tabItem {
+                    Image(systemName: "chart.bar")
+                    Text("Stats")
+                }
+
+            NavigationStack { ProfileView() }
+                .tabItem {
+                    Image(systemName: "person.circle")
+                    Text("Profile")
+                }
         }
-        .padding()
+        .tint(.blue)
     }
 }
 
