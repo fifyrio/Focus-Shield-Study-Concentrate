@@ -61,8 +61,11 @@ struct FlashcardSessionView: View {
             Spacer()
         }
         .padding()
-        .navigationTitle("Flashcards")
-        .navigationBarTitleDisplayMode(.inline)
+        .background(
+            LinearGradient(gradient: Gradient(colors: [Color(#colorLiteral(red:0.4,green:0.49,blue:0.92,alpha:1)), Color(#colorLiteral(red:0.46,green:0.29,blue:0.71,alpha:1))]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                .ignoresSafeArea()
+        )
+        .navigationBarHidden(true)
     }
 }
 
