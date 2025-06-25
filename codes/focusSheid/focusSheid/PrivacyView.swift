@@ -10,7 +10,7 @@ struct PrivacyView: View {
                 Text("Focus Shield collects minimal data to operate. We never sell your personal information.")
                 Text("Information We Collect")
                     .font(.headline)
-                Text("\u2022 App usage data for blocking functionality\n\u2022 Flashcard content you create\n\u2022 Study session statistics")
+                Text(" App usage data for blocking functionality\n Flashcard content you create\n Study session statistics")
                 Text("How We Use Information")
                     .font(.headline)
                 Text("Your data is used to provide core features like app blocking and progress tracking.")
