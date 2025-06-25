@@ -5,118 +5,463 @@ struct Deck: Identifiable {
     var title: String
     var totalCards: Int
     var mastered: Int
+    var color: Color
+    var icon: String
+    
+    var progress: Float {
+        return Float(mastered) / Float(totalCards)
+    }
+}
+
+private struct GlassMorphismCard<Content: View>: View {
+    let content: Content
+    
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+    
+    private var cardBackground: some View {
+        RoundedRectangle(cornerRadius: 24)
+            .fill(Color.white.opacity(0.95))
+            .background(
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(.ultraThinMaterial)
+            )
+    }
+    
+    private var cardShadows: some View {
+        cardBackground
+            .shadow(color: .black.opacity(0.12), radius: 32, x: 0, y: 8)
+            .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
+    }
+    
+    private var cardBorder: some View {
+        RoundedRectangle(cornerRadius: 24)
+            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+    }
+    
+    var body: some View {
+        content
+            .background(
+                cardShadows
+                    .overlay(cardBorder)
+            )
+    }
 }
 
 private struct StatItem: View {
     var value: String
     var label: String
+    
+    private var statBackground: some View {
+        RoundedRectangle(cornerRadius: 16)
+            .fill(Color(red: 0.4, green: 0.49, blue: 0.92).opacity(0.08))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color(red: 0.4, green: 0.49, blue: 0.92).opacity(0.1), lineWidth: 1)
+            )
+    }
+    
     var body: some View {
         VStack(spacing: 4) {
             Text(value)
-                .font(.title2.bold())
-                .foregroundColor(Color.blue)
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(Color(red: 0.4, green: 0.49, blue: 0.92))
+                .tracking(-0.3)
             Text(label)
-                .font(.caption)
+                .font(.system(size: 13, weight: .medium))
                 .foregroundColor(.secondary)
+                .tracking(0.1)
         }
         .frame(maxWidth: .infinity)
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.7))
-                .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
-        )
+        .padding(.vertical, 12)
+        .padding(.horizontal, 8)
+        .background(statBackground)
+    }
+}
+
+private struct AnimatedProgressBar: View {
+    let progress: Float
+    let color: Color
+    @State private var animatedProgress: Float = 0
+    
+    private var progressBackground: some View {
+        RoundedRectangle(cornerRadius: 4)
+            .fill(Color.gray.opacity(0.2))
+            .frame(height: 6)
+    }
+    
+    private func progressFill(width: CGFloat) -> some View {
+        RoundedRectangle(cornerRadius: 4)
+            .fill(
+                LinearGradient(
+                    colors: [color, color.opacity(0.8)],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .frame(width: width * CGFloat(animatedProgress), height: 6)
+    }
+    
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                progressBackground
+                progressFill(width: geometry.size.width)
+            }
+        }
+        .frame(height: 6)
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.5).delay(0.2)) {
+                animatedProgress = progress
+            }
+        }
     }
 }
 
 private struct DeckCard: View {
     var deck: Deck
+    @State private var isHovered = false
+    @State private var isPressed = false
+    
+    private var deckIcon: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(
+                    LinearGradient(
+                        colors: [deck.color, deck.color.opacity(0.8)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 44, height: 44)
+                .shadow(color: deck.color.opacity(0.3), radius: 8, x: 0, y: 4)
+            
+            Text(deck.icon)
+                .font(.title2)
+        }
+    }
+    
+    private var deckHeader: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(deck.title)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.primary)
+                    .tracking(-0.2)
+                
+                Text("\(deck.mastered)/\(deck.totalCards) mastered")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.secondary)
+                    .tracking(0.1)
+            }
+            Spacer()
+            deckIcon
+        }
+    }
+    
+    private var progressSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Progress")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text("\(Int(deck.progress * 100))%")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(deck.color)
+            }
+            
+            AnimatedProgressBar(progress: deck.progress, color: deck.color)
+        }
+    }
+    
+    private var studyButtonGradient: LinearGradient {
+        LinearGradient(
+            colors: [deck.color, deck.color.opacity(0.8)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
+    private var studyButton: some View {
+        Button("Study Now") {
+            // Study action
+        }
+        .font(.system(size: 15, weight: .semibold))
+        .foregroundColor(.white)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(studyButtonGradient)
+                .shadow(color: deck.color.opacity(0.3), radius: 8, x: 0, y: 4)
+        )
+    }
+    
+    private var editButtonBackground: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .stroke(deck.color.opacity(0.3), lineWidth: 1.5)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(deck.color.opacity(0.05))
+            )
+    }
+    
+    private var editButton: some View {
+        Button("Edit") {
+            // Edit action
+        }
+        .font(.system(size: 15, weight: .medium))
+        .foregroundColor(deck.color)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 10)
+        .background(editButtonBackground)
+    }
+    
+    private var actionButtons: some View {
+        HStack(spacing: 12) {
+            studyButton
+            editButton
+        }
+    }
+    
+    private var cardContent: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            deckHeader
+            progressSection
+            actionButtons
+        }
+    }
+    
+    private var cardBaseBackground: some View {
+        RoundedRectangle(cornerRadius: 20)
+            .fill(Color.white.opacity(0.9))
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(.ultraThinMaterial)
+            )
+    }
+    
+    private var cardShadows: some View {
+        cardBaseBackground
+            .shadow(color: .black.opacity(0.08), radius: 25, x: 0, y: 8)
+            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 3)
+    }
+    
+    private var cardBorder: some View {
+        RoundedRectangle(cornerRadius: 20)
+            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+    }
+    
+    private var hoverOverlay: some View {
+        LinearGradient(
+            colors: [Color.white.opacity(0.1), Color.clear],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .opacity(isHovered ? 1 : 0)
+    }
+    
+    private var cardBackground: some View {
+        cardShadows
+            .overlay(cardBorder)
+            .overlay(hoverOverlay)
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(deck.title)
-                        .font(.headline)
-                    Text("\(deck.mastered)/\(deck.totalCards) mastered")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.secondary)
+        cardContent
+            .padding(24)
+            .background(cardBackground)
+            .scaleEffect(isPressed ? 0.98 : (isHovered ? 1.02 : 1.0))
+            .offset(y: isHovered ? -6 : 0)
+            .animation(.easeInOut(duration: 0.4), value: isHovered)
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isPressed)
+            .onTapGesture {
+                performTapAnimation()
             }
-
-            ProgressView(value: Float(deck.mastered), total: Float(deck.totalCards))
-                .progressViewStyle(.linear)
-                .tint(.blue)
-
-            HStack {
-                Button("Study Now") {}
-                    .buttonStyle(.borderedProminent)
-                Button("Edit") {}
-                    .buttonStyle(.bordered)
+            .onLongPressGesture(minimumDuration: 0) {
+                // Handle press state changes
+            } onPressingChanged: { pressing in
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isHovered = pressing
+                }
+            }
+    }
+    
+    private func performTapAnimation() {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+            isPressed = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                isPressed = false
             }
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color.white.opacity(0.9))
-                .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
-        )
     }
 }
 
 struct DecksView: View {
     @State private var decks: [Deck] = [
-        Deck(title: "Mathematics", totalCards: 20, mastered: 12),
-        Deck(title: "Science Facts", totalCards: 15, mastered: 10),
-        Deck(title: "History", totalCards: 12, mastered: 5)
+        Deck(title: "Mathematics", totalCards: 20, mastered: 12, color: Color(red: 0.0, green: 0.48, blue: 1.0), icon: "📊"),
+        Deck(title: "Science Facts", totalCards: 15, mastered: 10, color: Color(red: 0.2, green: 0.78, blue: 0.35), icon: "🧪"),
+        Deck(title: "History", totalCards: 12, mastered: 5, color: Color(red: 1.0, green: 0.42, blue: 0.21), icon: "🏛️"),
+        Deck(title: "Languages", totalCards: 25, mastered: 18, color: Color(red: 0.8, green: 0.2, blue: 0.8), icon: "🗣️")
     ]
+    
+    // Extract complex gradient background
+    private func backgroundGradient(geometry: GeometryProxy) -> some View {
+        LinearGradient(
+            colors: [
+                Color(red: 0.4, green: 0.49, blue: 0.92),
+                Color(red: 0.46, green: 0.29, blue: 0.71),
+                Color(red: 0.4, green: 0.49, blue: 0.92)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .overlay(radialOverlay1(geometry: geometry))
+        .overlay(radialOverlay2(geometry: geometry))
+        .overlay(radialOverlay3(geometry: geometry))
+        .ignoresSafeArea()
+    }
+    
+    private func radialOverlay1(geometry: GeometryProxy) -> some View {
+        RadialGradient(
+            colors: [Color.white.opacity(0.1), Color.clear],
+            center: UnitPoint(x: 0.2, y: 0.2),
+            startRadius: 0,
+            endRadius: geometry.size.width * 0.5
+        )
+    }
+    
+    private func radialOverlay2(geometry: GeometryProxy) -> some View {
+        RadialGradient(
+            colors: [Color.white.opacity(0.08), Color.clear],
+            center: UnitPoint(x: 0.8, y: 0.4),
+            startRadius: 0,
+            endRadius: geometry.size.width * 0.5
+        )
+    }
+    
+    private func radialOverlay3(geometry: GeometryProxy) -> some View {
+        RadialGradient(
+            colors: [Color.white.opacity(0.06), Color.clear],
+            center: UnitPoint(x: 0.4, y: 0.8),
+            startRadius: 0,
+            endRadius: geometry.size.width * 0.5
+        )
+    }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                header
-                stats
-                    .padding(.horizontal)
-
-                VStack(spacing: 16) {
-                    ForEach(decks) { deck in
-                        NavigationLink(destination: FlashcardSessionView(deck: deck)) {
-                            DeckCard(deck: deck)
-                        }
-                    }
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 0) {
+                    headerSection
+                        .frame(maxWidth: .infinity)
+                    
+                    contentSection
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 40)
             }
+            .background(backgroundGradient(geometry: geometry))
         }
-        .background(
-            LinearGradient(gradient: Gradient(colors: [Color(#colorLiteral(red:0.4,green:0.49,blue:0.92,alpha:1)), Color(#colorLiteral(red:0.46,green:0.29,blue:0.71,alpha:1))]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea()
-        )
-        .navigationBarHidden(true)
+        #if os(iOS)
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
+        #endif
+    }
+    
+    private var contentSection: some View {
+        VStack(spacing: 24) {
+            statsBar
+                .padding(.horizontal, 20)
+                .offset(y: -30)
+            
+            sectionHeader
+                .padding(.horizontal, 24)
+                .offset(y: -30)
+            
+            decksList
+                .padding(.horizontal, 20)
+                .offset(y: -30)
+        }
+        .padding(.bottom, 120)
     }
 
-    private var header: some View {
-        VStack(spacing: 4) {
+    private var headerSection: some View {
+        VStack(spacing: 8) {
             Text("Flashcard Decks")
-                .font(.largeTitle.bold())
+                .font(.system(size: 32, weight: .bold))
                 .foregroundColor(.white)
+                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 2)
+                .tracking(-0.5)
+            
             Text("Choose a deck to study")
+                .font(.system(size: 17, weight: .regular))
                 .foregroundColor(.white.opacity(0.9))
-                .font(.subheadline)
+                .tracking(0.2)
         }
         .padding(.top, 60)
-        .padding(.bottom, 40)
+        .padding(.bottom, 70)
     }
 
-    private var stats: some View {
-        HStack(spacing: 12) {
-            StatItem(value: "3", label: "Decks")
-            StatItem(value: "47", label: "Cards")
-            StatItem(value: "7d", label: "Streak")
+    private var statsBar: some View {
+        GlassMorphismCard {
+            HStack(spacing: 20) {
+                StatItem(value: "\(decks.count)", label: "Decks")
+                StatItem(value: "\(decks.reduce(0) { $0 + $1.totalCards })", label: "Cards")
+                StatItem(value: "7d", label: "Streak")
+            }
+            .padding(24)
+        }
+    }
+    
+    private var addButtonGradient: LinearGradient {
+        LinearGradient(
+            colors: [Color(red: 0.0, green: 0.48, blue: 1.0), Color(red: 0.35, green: 0.34, blue: 0.84)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
+    private var addButtonBackground: some View {
+        Circle()
+            .fill(addButtonGradient)
+            .shadow(color: Color(red: 0.0, green: 0.48, blue: 1.0).opacity(0.3), radius: 12, x: 0, y: 4)
+    }
+    
+    private var sectionHeader: some View {
+        HStack {
+            Text("My Decks")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(.white)
+                .tracking(-0.4)
+            
+            Spacer()
+            
+            Button(action: {
+                // Add new deck
+            }) {
+                Image(systemName: "plus")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 36, height: 36)
+                    .background(addButtonBackground)
+            }
+            .scaleEffect(1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: 1.0)
+        }
+    }
+    
+    private var decksList: some View {
+        LazyVStack(spacing: 16) {
+            ForEach(decks) { deck in
+                NavigationLink(destination: Text("Flashcard Session")) {
+                    DeckCard(deck: deck)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
         }
     }
 }

@@ -69,6 +69,6 @@ struct FlashcardSessionView: View {
     }
 }
 
-#Preview {
-    NavigationStack { FlashcardSessionView(deck: Deck(title: "Sample", totalCards: 3, mastered: 0)) }
-}
+//#Preview {
+//    NavigationStack { FlashcardSessionView(deck: Deck(title: "Sample", totalCards: 3, mastered: 0)) }
+//}

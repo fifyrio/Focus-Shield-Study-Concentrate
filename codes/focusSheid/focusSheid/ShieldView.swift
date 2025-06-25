@@ -8,29 +8,170 @@ struct AppItem: Identifiable {
     var blocked: Bool
 }
 
+private struct GlassMorphismCard<Content: View>: View {
+    let content: Content
+    
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+    
+    private var cardBackground: some View {
+        RoundedRectangle(cornerRadius: 24)
+            .fill(Color.white.opacity(0.95))
+            .background(
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(.ultraThinMaterial)
+            )
+    }
+    
+    private var cardShadows: some View {
+        cardBackground
+            .shadow(color: .black.opacity(0.12), radius: 32, x: 0, y: 8)
+            .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
+    }
+    
+    private var cardBorder: some View {
+        RoundedRectangle(cornerRadius: 24)
+            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+    }
+    
+    var body: some View {
+        content
+            .background(
+                cardShadows
+                    .overlay(cardBorder)
+            )
+    }
+}
+
+private struct PulsingDot: View {
+    @State private var isPulsing = false
+    
+    private var dotGradient: LinearGradient {
+        LinearGradient(
+            colors: [Color(red: 0.2, green: 0.78, blue: 0.35), Color(red: 0.19, green: 0.82, blue: 0.35)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
+    private var pulseShadow: Color {
+        Color(red: 0.2, green: 0.78, blue: 0.35).opacity(0.4)
+    }
+    
+    var body: some View {
+        Circle()
+            .fill(dotGradient)
+            .frame(width: 14, height: 14)
+            .scaleEffect(isPulsing ? 1.1 : 1.0)
+            .shadow(color: pulseShadow, radius: isPulsing ? 8 : 0)
+            .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: isPulsing)
+            .onAppear {
+                isPulsing = true
+            }
+    }
+}
+
 private struct AppCard: View {
     var item: AppItem
-    var body: some View {
-        VStack(spacing: 8) {
+    @State private var isHovered = false
+    
+    private var iconBackground: some View {
+        RoundedRectangle(cornerRadius: 16)
+            .fill(
+                LinearGradient(
+                    colors: [item.color, item.color.opacity(0.8)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .frame(width: 56, height: 56)
+            .shadow(color: item.color.opacity(0.3), radius: 8, x: 0, y: 4)
+    }
+    
+    private var statusBadge: some View {
+        Text(item.blocked ? "Blocked" : "Allowed")
+            .font(.caption)
+            .foregroundColor(item.blocked ? .red : .green)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                Capsule()
+                    .fill((item.blocked ? Color.red : Color.green).opacity(0.1))
+            )
+    }
+    
+    private var cardContent: some View {
+        VStack(spacing: 12) {
             ZStack {
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(item.color)
-                    .frame(width: 56, height: 56)
+                iconBackground
                 Text(item.icon)
+                    .font(.title2)
             }
+            
             Text(item.name)
-                .font(.footnote)
-                .fontWeight(.semibold)
+                .font(.system(size: 15, weight: .semibold))
                 .foregroundColor(.primary)
-            Text(item.blocked ? "Blocked" : "Allowed")
-                .font(.caption)
-                .foregroundColor(.secondary)
+            
+            statusBadge
         }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 20).fill(Color.white.opacity(0.9))
+    }
+    
+    private var cardBaseBackground: some View {
+        RoundedRectangle(cornerRadius: 20)
+            .fill(Color.white.opacity(0.9))
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(.ultraThinMaterial)
+            )
+    }
+    
+    private var cardShadows: some View {
+        cardBaseBackground
+            .shadow(color: .black.opacity(0.08), radius: 25, x: 0, y: 8)
+            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 3)
+    }
+    
+    private var cardBorder: some View {
+        RoundedRectangle(cornerRadius: 20)
+            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+    }
+    
+    private var hoverOverlay: some View {
+        LinearGradient(
+            colors: [Color.white.opacity(0.1), Color.clear],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
         )
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .opacity(isHovered ? 1 : 0)
+    }
+    
+    private var cardBackground: some View {
+        cardShadows
+            .overlay(cardBorder)
+            .overlay(hoverOverlay)
+    }
+
+    var body: some View {
+        cardContent
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 24)
+            .padding(.horizontal, 20)
+            .background(cardBackground)
+            .scaleEffect(isHovered ? 1.02 : 1.0)
+            .offset(y: isHovered ? -6 : 0)
+            .animation(.easeInOut(duration: 0.4), value: isHovered)
+            .onTapGesture {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                    isHovered.toggle()
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                        isHovered = false
+                    }
+                }
+            }
     }
 }
 
@@ -40,69 +181,166 @@ struct ShieldView: View {
     @State private var timer: Timer? = nil
 
     private let apps: [AppItem] = [
-        AppItem(name: "Instagram", icon: "📷", color: Color.purple, blocked: true),
-        AppItem(name: "YouTube", icon: "▶️", color: Color.red, blocked: true),
-        AppItem(name: "TikTok", icon: "🎵", color: Color.pink, blocked: true),
-        AppItem(name: "Facebook", icon: "👤", color: Color.blue, blocked: true)
+        AppItem(name: "Instagram", icon: "📷", color: Color(red: 0.8, green: 0.2, blue: 0.8), blocked: true),
+        AppItem(name: "YouTube", icon: "▶️", color: Color(red: 1.0, green: 0.2, blue: 0.2), blocked: true),
+        AppItem(name: "TikTok", icon: "🎵", color: Color(red: 1.0, green: 0.4, blue: 0.8), blocked: true),
+        AppItem(name: "Facebook", icon: "👤", color: Color(red: 0.2, green: 0.4, blue: 1.0), blocked: true)
     ]
-
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                header
-                statusCard
-                appGrid
-            }
-            .padding(.horizontal)
-            .padding(.bottom, 80)
-        }
-        .background(
-            LinearGradient(gradient: Gradient(colors: [Color(#colorLiteral(red:0.4,green:0.49,blue:0.92,alpha:1)), Color(#colorLiteral(red:0.46,green:0.29,blue:0.71,alpha:1))]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea()
+    
+    // Extract complex gradient background
+    private func backgroundGradient(geometry: GeometryProxy) -> some View {
+        LinearGradient(
+            colors: [
+                Color(red: 0.4, green: 0.49, blue: 0.92),
+                Color(red: 0.46, green: 0.29, blue: 0.71),
+                Color(red: 0.4, green: 0.49, blue: 0.92)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
         )
-        .overlay(floatingButton, alignment: .bottomTrailing)
-        .navigationBarHidden(true)
+        .overlay(radialOverlay1(geometry: geometry))
+        .overlay(radialOverlay2(geometry: geometry))
+        .overlay(radialOverlay3(geometry: geometry))
+        .ignoresSafeArea()
+    }
+    
+    private func radialOverlay1(geometry: GeometryProxy) -> some View {
+        RadialGradient(
+            colors: [Color.white.opacity(0.1), Color.clear],
+            center: UnitPoint(x: 0.2, y: 0.2),
+            startRadius: 0,
+            endRadius: geometry.size.width * 0.5
+        )
+    }
+    
+    private func radialOverlay2(geometry: GeometryProxy) -> some View {
+        RadialGradient(
+            colors: [Color.white.opacity(0.08), Color.clear],
+            center: UnitPoint(x: 0.8, y: 0.4),
+            startRadius: 0,
+            endRadius: geometry.size.width * 0.5
+        )
+    }
+    
+    private func radialOverlay3(geometry: GeometryProxy) -> some View {
+        RadialGradient(
+            colors: [Color.white.opacity(0.06), Color.clear],
+            center: UnitPoint(x: 0.4, y: 0.8),
+            startRadius: 0,
+            endRadius: geometry.size.width * 0.5
+        )
     }
 
-    private var header: some View {
-        VStack(spacing: 4) {
+    var body: some View {
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 0) {
+                    headerSection
+                        .frame(maxWidth: .infinity)
+                    
+                    contentSection
+                }
+            }
+            .background(backgroundGradient(geometry: geometry))
+            .overlay(floatingButton, alignment: .bottomTrailing)
+        }
+        #if os(iOS)
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
+        #endif
+    }
+    
+    private var contentSection: some View {
+        VStack(spacing: 24) {
+            statusCard
+                .padding(.horizontal, 20)
+                .offset(y: -30)
+            
+            appGrid
+                .padding(.horizontal, 20)
+                .offset(y: -30)
+        }
+        .padding(.bottom, 120)
+    }
+
+    private var headerSection: some View {
+        VStack(spacing: 8) {
             Text("Focus Shield")
-                .font(.largeTitle.bold())
+                .font(.system(size: 32, weight: .bold))
                 .foregroundColor(.white)
+                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 2)
+                .tracking(-0.5)
+            
             Text("Study & Concentrate")
+                .font(.system(size: 17, weight: .regular))
                 .foregroundColor(.white.opacity(0.9))
-                .font(.subheadline)
+                .tracking(0.2)
         }
         .padding(.top, 60)
+        .padding(.bottom, 70)
     }
 
     private var statusCard: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 12) {
-                Circle()
-                    .fill(Color.green)
-                    .frame(width: 14, height: 14)
-                    .overlay(
-                        Circle().stroke(Color.white, lineWidth: 2)
-                    )
-                    .shadow(radius: 4)
-                Text("Active")
-                    .fontWeight(.semibold)
-                    .foregroundColor(.green)
-            }
-            Text("My First Deck")
-                .font(.headline)
-            Text("1 Flashcard")
-                .font(.caption)
-                .foregroundColor(.secondary)
-            Text("Answer flashcards to unlock apps")
-                .font(.footnote)
-                .foregroundColor(.primary)
-                .padding(.top, 4)
+        GlassMorphismCard {
+            statusCardContent
         }
-        .padding()
+    }
+    
+    private var statusCardContent: some View {
+        VStack(spacing: 20) {
+            statusIndicator
+            deckInfo
+            unlockMessage
+        }
+        .padding(.horizontal, 28)
+        .padding(.vertical, 28)
         .frame(maxWidth: .infinity)
-        .background(RoundedRectangle(cornerRadius: 24).fill(Color.white.opacity(0.95)))
+    }
+    
+    private var statusIndicator: some View {
+        HStack(spacing: 12) {
+            PulsingDot()
+            Text("Active")
+                .font(.system(size: 19, weight: .semibold))
+                .foregroundColor(Color(red: 0.2, green: 0.78, blue: 0.35))
+                .tracking(-0.2)
+        }
+    }
+    
+    private var deckInfo: some View {
+        VStack(spacing: 6) {
+            Text("My First Deck")
+                .font(.system(size: 22, weight: .bold))
+                .foregroundColor(.primary)
+                .tracking(-0.3)
+            
+            Text("1 Flashcard")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(.secondary)
+                .tracking(0.1)
+        }
+    }
+    
+    private var unlockMessageGradient: LinearGradient {
+        LinearGradient(
+            colors: [Color(red: 1.0, green: 0.58, blue: 0.0), Color(red: 1.0, green: 0.42, blue: 0.21)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
+    private var unlockMessage: some View {
+        Text("Answer flashcards to unlock apps")
+            .font(.system(size: 15, weight: .semibold))
+            .foregroundColor(.white)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(unlockMessageGradient)
+                    .shadow(color: Color(red: 1.0, green: 0.58, blue: 0.0).opacity(0.3), radius: 16, x: 0, y: 4)
+            )
+            .tracking(0.1)
     }
 
     private var appGrid: some View {
@@ -112,15 +350,29 @@ struct ShieldView: View {
             }
         }
     }
+    
+    private var floatingButtonGradient: LinearGradient {
+        LinearGradient(
+            colors: [Color(red: 0.0, green: 0.48, blue: 1.0), Color(red: 0.35, green: 0.34, blue: 0.84)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
+    private var floatingButtonBackground: some View {
+        Circle()
+            .fill(floatingButtonGradient)
+            .shadow(color: Color(red: 0.0, green: 0.48, blue: 1.0).opacity(0.3), radius: 12, x: 0, y: 6)
+            .shadow(color: Color(red: 0.0, green: 0.48, blue: 1.0).opacity(0.4), radius: 16, x: 0, y: 4)
+    }
 
     private var floatingButton: some View {
         Button(action: {}) {
             Text("🎯")
                 .font(.title)
                 .frame(width: 56, height: 56)
-                .background(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                .background(floatingButtonBackground)
                 .foregroundColor(.white)
-                .clipShape(Circle())
         }
         .padding()
     }
