@@ -138,8 +138,7 @@ struct StatsView: View {
                 .font(.title2.bold())
                 .foregroundColor(.white)
             HStack(alignment: .bottom, spacing: 8) {
-                ForEach(weekly.indices, id: \.
-self) { i in
+                ForEach(weekly.indices, id: \.self) { i in
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color.white.opacity(0.9))
                         .frame(width: 20, height: CGFloat(weekly[i]) * 100)
