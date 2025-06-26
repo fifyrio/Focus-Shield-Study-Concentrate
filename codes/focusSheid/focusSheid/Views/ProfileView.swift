@@ -345,7 +345,7 @@ struct ProfileView: View {
                     colors: [Color(red: 1.0, green: 0.4, blue: 0.6), Color(red: 1.0, green: 0.58, blue: 0.0)],
                     title: "Upgrade to Pro",
                     subtitle: "Unlock premium features",
-                    destination: Text("Upgrade View")
+                    destination: UpgradeView()
                 )
             }
             .background(sectionBackground)
@@ -362,7 +362,7 @@ struct ProfileView: View {
                     colors: [Color(red: 0.3, green: 0.85, blue: 0.8), Color(red: 0.27, green: 0.63, blue: 0.55)],
                     title: "Follow us on X",
                     subtitle: "Stay updated with latest features",
-                    destination: Text("Follow us on X")
+                    destination: SocialLinksView()
                 )
                 
                 MenuRow(
@@ -370,7 +370,7 @@ struct ProfileView: View {
                     colors: [Color(red: 0.27, green: 0.71, blue: 0.82), Color(red: 0.59, green: 0.79, blue: 0.24)],
                     title: "Help Center",
                     subtitle: "Get support and answers",
-                    destination: Text("Help Center")
+                    destination: HelpView()
                 )
                 
                 MenuRow(
@@ -378,7 +378,7 @@ struct ProfileView: View {
                     colors: [Color(red: 0.94, green: 0.58, blue: 0.98), Color(red: 0.96, green: 0.34, blue: 0.43)],
                     title: "Privacy Policy",
                     subtitle: "How we protect your data",
-                    destination: Text("Privacy Policy")
+                    destination: PrivacyView()
                 )
                 
                 MenuRow(
@@ -386,7 +386,7 @@ struct ProfileView: View {
                     colors: [Color(red: 0.31, green: 0.68, blue: 1.0), Color(red: 0.0, green: 0.95, blue: 1.0)],
                     title: "Terms of Use",
                     subtitle: "Terms and conditions",
-                    destination: Text("Terms of Use")
+                    destination: TermsView()
                 )
             }
             .background(sectionBackground)
