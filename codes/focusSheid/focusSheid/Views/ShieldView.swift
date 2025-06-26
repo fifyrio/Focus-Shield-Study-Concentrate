@@ -82,18 +82,6 @@ private struct AppCard: View {
             .shadow(color: item.color.opacity(0.3), radius: 8, x: 0, y: 4)
     }
     
-    private var statusBadge: some View {
-        Text(item.blocked ? "Blocked" : "Allowed")
-            .font(.caption)
-            .foregroundColor(item.blocked ? .red : .green)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(
-                Capsule()
-                    .fill((item.blocked ? Color.red : Color.green).opacity(0.1))
-            )
-    }
-    
     private var cardContent: some View {
         VStack(spacing: 12) {
             ZStack {
@@ -105,8 +93,6 @@ private struct AppCard: View {
             Text(item.name)
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundColor(.primary)
-            
-            statusBadge
         }
     }
     
