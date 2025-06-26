@@ -66,7 +66,7 @@ private struct PulsingDot: View {
 
 private struct AppCard: View {
     var item: AppItem
-    var onToggle: () -> Void
+    var onTap: () -> Void
     @State private var isHovered = false
     
     private var iconBackground: some View {
@@ -156,7 +156,7 @@ private struct AppCard: View {
             .offset(y: isHovered ? -6 : 0)
             .animation(.easeInOut(duration: 0.4), value: isHovered)
             .onTapGesture {
-                onToggle()
+                onTap()
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                     isHovered.toggle()
                 }
@@ -173,6 +173,8 @@ struct ShieldView: View {
     @StateObject private var viewModel = ShieldViewModel()
     @StateObject private var statsViewModel = StatsViewModel()
     @State private var showingAppSelection = false
+    @State private var showingSetupInstructions = false
+    @State private var selectedAppForSetup: AppItem? = nil
     
     // Extract complex gradient background
     private func backgroundGradient(geometry: GeometryProxy) -> some View {
@@ -233,6 +235,11 @@ struct ShieldView: View {
         }
         .sheet(isPresented: $showingAppSelection) {
             AppSelectionView()
+        }
+        .sheet(isPresented: $showingSetupInstructions) {
+            if let app = selectedAppForSetup {
+                SetupInstructionsView(appName: app.name)
+            }
         }
         #if os(iOS)
         .navigationBarBackButtonHidden(true)
@@ -336,8 +343,9 @@ struct ShieldView: View {
     private var appGrid: some View {
         LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 2), spacing: 16) {
             ForEach(viewModel.apps) { app in
-                AppCard(item: app, onToggle: {
-                    viewModel.toggleAppBlocking(for: app)
+                AppCard(item: app, onTap: {
+                    selectedAppForSetup = app
+                    showingSetupInstructions = true
                 })
             }
         }
