@@ -1,13 +1,5 @@
 import SwiftUI
 
-struct AppItem: Identifiable {
-    let id = UUID()
-    var name: String
-    var icon: String
-    var color: Color
-    var blocked: Bool
-}
-
 private struct GlassMorphismCard<Content: View>: View {
     let content: Content
     
@@ -74,6 +66,7 @@ private struct PulsingDot: View {
 
 private struct AppCard: View {
     var item: AppItem
+    var onToggle: () -> Void
     @State private var isHovered = false
     
     private var iconBackground: some View {
@@ -163,6 +156,7 @@ private struct AppCard: View {
             .offset(y: isHovered ? -6 : 0)
             .animation(.easeInOut(duration: 0.4), value: isHovered)
             .onTapGesture {
+                onToggle()
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                     isHovered.toggle()
                 }
@@ -176,16 +170,8 @@ private struct AppCard: View {
 }
 
 struct ShieldView: View {
-    @State private var focusTime: Int = 25
-    @State private var running = false
-    @State private var timer: Timer? = nil
-
-    private let apps: [AppItem] = [
-        AppItem(name: "Instagram", icon: "📷", color: Color(red: 0.8, green: 0.2, blue: 0.8), blocked: true),
-        AppItem(name: "YouTube", icon: "▶️", color: Color(red: 1.0, green: 0.2, blue: 0.2), blocked: true),
-        AppItem(name: "TikTok", icon: "🎵", color: Color(red: 1.0, green: 0.4, blue: 0.8), blocked: true),
-        AppItem(name: "Facebook", icon: "👤", color: Color(red: 0.2, green: 0.4, blue: 1.0), blocked: true)
-    ]
+    @StateObject private var viewModel = ShieldViewModel()
+    @StateObject private var statsViewModel = StatsViewModel()
     
     // Extract complex gradient background
     private func backgroundGradient(geometry: GeometryProxy) -> some View {
@@ -300,21 +286,21 @@ struct ShieldView: View {
     private var statusIndicator: some View {
         HStack(spacing: 12) {
             PulsingDot()
-            Text("Active")
+            Text(viewModel.isRunning ? "Active" : "Inactive")
                 .font(.system(size: 19, weight: .semibold))
-                .foregroundColor(Color(red: 0.2, green: 0.78, blue: 0.35))
+                .foregroundColor(viewModel.isRunning ? Color(red: 0.2, green: 0.78, blue: 0.35) : .gray)
                 .tracking(-0.2)
         }
     }
     
     private var deckInfo: some View {
         VStack(spacing: 6) {
-            Text("My First Deck")
+            Text(viewModel.currentDeck?.title ?? "No Deck")
                 .font(.system(size: 22, weight: .bold))
                 .foregroundColor(.primary)
                 .tracking(-0.3)
             
-            Text("1 Flashcard")
+            Text("\(viewModel.currentDeck?.flashcards.count ?? 0) Flashcards")
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(.secondary)
                 .tracking(0.1)
@@ -345,8 +331,10 @@ struct ShieldView: View {
 
     private var appGrid: some View {
         LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 2), spacing: 16) {
-            ForEach(apps) { app in
-                AppCard(item: app)
+            ForEach(viewModel.apps) { app in
+                AppCard(item: app, onToggle: {
+                    viewModel.toggleAppBlocking(for: app)
+                })
             }
         }
     }
@@ -367,14 +355,23 @@ struct ShieldView: View {
     }
 
     private var floatingButton: some View {
-        Button(action: {}) {
-            Text("🎯")
+        Button(action: {
+            if viewModel.isRunning {
+                viewModel.stopFocusSession()
+            } else {
+                viewModel.startFocusSession()
+            }
+        }) {
+            Text(viewModel.isRunning ? "⏸️" : "🎯")
                 .font(.title)
                 .frame(width: 56, height: 56)
                 .background(floatingButtonBackground)
                 .foregroundColor(.white)
         }
         .padding()
+        .onReceive(NotificationCenter.default.publisher(for: .unlockApps)) { _ in
+            viewModel.unlockAppsAfterStudy()
+        }
     }
 }
 

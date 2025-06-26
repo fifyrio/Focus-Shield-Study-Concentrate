@@ -1,18 +1,5 @@
 import SwiftUI
 
-struct Deck: Identifiable {
-    let id = UUID()
-    var title: String
-    var totalCards: Int
-    var mastered: Int
-    var color: Color
-    var icon: String
-    
-    var progress: Float {
-        return Float(mastered) / Float(totalCards)
-    }
-}
-
 private struct GlassMorphismCard<Content: View>: View {
     let content: Content
     
@@ -123,6 +110,8 @@ private struct DeckCard: View {
     var deck: Deck
     @State private var isHovered = false
     @State private var isPressed = false
+    var onStudy: (() -> Void)? = nil
+    var onEdit: (() -> Void)? = nil
     
     private var deckIcon: some View {
         ZStack {
@@ -186,7 +175,7 @@ private struct DeckCard: View {
     
     private var studyButton: some View {
         Button("Study Now") {
-            // Study action
+            onStudy?()
         }
         .font(.system(size: 15, weight: .semibold))
         .foregroundColor(.white)
@@ -210,7 +199,7 @@ private struct DeckCard: View {
     
     private var editButton: some View {
         Button("Edit") {
-            // Edit action
+            onEdit?()
         }
         .font(.system(size: 15, weight: .medium))
         .foregroundColor(deck.color)
@@ -303,12 +292,7 @@ private struct DeckCard: View {
 }
 
 struct DecksView: View {
-    @State private var decks: [Deck] = [
-        Deck(title: "Mathematics", totalCards: 20, mastered: 12, color: Color(red: 0.0, green: 0.48, blue: 1.0), icon: "📊"),
-        Deck(title: "Science Facts", totalCards: 15, mastered: 10, color: Color(red: 0.2, green: 0.78, blue: 0.35), icon: "🧪"),
-        Deck(title: "History", totalCards: 12, mastered: 5, color: Color(red: 1.0, green: 0.42, blue: 0.21), icon: "🏛️"),
-        Deck(title: "Languages", totalCards: 25, mastered: 18, color: Color(red: 0.8, green: 0.2, blue: 0.8), icon: "🗣️")
-    ]
+    @StateObject private var viewModel = DecksViewModel()
     
     // Extract complex gradient background
     private func backgroundGradient(geometry: GeometryProxy) -> some View {
@@ -409,9 +393,9 @@ struct DecksView: View {
     private var statsBar: some View {
         GlassMorphismCard {
             HStack(spacing: 20) {
-                StatItem(value: "\(decks.count)", label: "Decks")
-                StatItem(value: "\(decks.reduce(0) { $0 + $1.totalCards })", label: "Cards")
-                StatItem(value: "7d", label: "Streak")
+                StatItem(value: "\(viewModel.decks.count)", label: "Decks")
+                StatItem(value: viewModel.formattedTotalCards, label: "Cards")
+                StatItem(value: viewModel.formattedStreak, label: "Streak")
             }
             .padding(24)
         }
@@ -441,7 +425,13 @@ struct DecksView: View {
             Spacer()
             
             Button(action: {
-                // Add new deck
+                viewModel.addDeck(Deck(
+                    title: "New Deck",
+                    totalCards: 0,
+                    mastered: 0,
+                    color: .blue,
+                    icon: "📚"
+                ))
             }) {
                 Image(systemName: "plus")
                     .font(.system(size: 18, weight: .semibold))
@@ -456,8 +446,8 @@ struct DecksView: View {
     
     private var decksList: some View {
         LazyVStack(spacing: 16) {
-            ForEach(decks) { deck in
-                NavigationLink(destination: Text("Flashcard Session")) {
+            ForEach(viewModel.decks) { deck in
+                NavigationLink(destination: FlashcardSessionView(deck: deck)) {
                     DeckCard(deck: deck)
                 }
                 .buttonStyle(PlainButtonStyle())

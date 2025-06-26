@@ -72,7 +72,7 @@ private struct ActivityItem: View {
 }
 
 struct StatsView: View {
-    private let weekly: [Double] = [0.6, 0.8, 0.45, 0.9, 1.2, 1.0, 1.4]
+    @StateObject private var viewModel = StatsViewModel()
 
     var body: some View {
         ScrollView {
@@ -87,10 +87,11 @@ struct StatsView: View {
             .padding(.bottom, 40)
         }
         .background(
-            LinearGradient(gradient: Gradient(colors: [Color(#colorLiteral(red:0.4,green:0.49,blue:0.92,alpha:1)), Color(#colorLiteral(red:0.46,green:0.29,blue:0.71,alpha:1))]), startPoint: .topLeading, endPoint: .bottomTrailing)
+            LinearGradient(gradient: Gradient(colors: [Color(red: 0.4, green: 0.49, blue: 0.92), Color(red: 0.46, green: 0.29, blue: 0.71)]), startPoint: .topLeading, endPoint: .bottomTrailing)
                 .ignoresSafeArea()
         )
-        .navigationBarHidden(true)
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     private var header: some View {
@@ -108,12 +109,12 @@ struct StatsView: View {
     private var overview: some View {
         VStack(spacing: 16) {
             HStack(spacing: 12) {
-                OverviewItem(number: "102", label: "Cards")
-                OverviewItem(number: "14d", label: "Streak")
+                OverviewItem(number: "\(viewModel.userStats.totalCards)", label: "Cards")
+                OverviewItem(number: viewModel.formattedStreak, label: "Streak")
             }
             HStack(spacing: 12) {
-                OverviewItem(number: "5h", label: "Focus")
-                OverviewItem(number: "6", label: "Decks")
+                OverviewItem(number: viewModel.formattedFocusTime, label: "Focus")
+                OverviewItem(number: "\(viewModel.userStats.totalDecks)", label: "Decks")
             }
         }
     }
@@ -124,10 +125,9 @@ struct StatsView: View {
                 .font(.title2.bold())
                 .foregroundColor(.white)
             LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 3), spacing: 12) {
-                AchievementItem(title: "First Steps", icon: "🏆", unlocked: true)
-                AchievementItem(title: "On Fire", icon: "🔥", unlocked: true)
-                AchievementItem(title: "Scholar", icon: "📚", unlocked: true)
-                AchievementItem(title: "Diamond", icon: "💎", unlocked: false)
+                ForEach(viewModel.userStats.achievements) { achievement in
+                    AchievementItem(title: achievement.title, icon: achievement.icon, unlocked: achievement.unlocked)
+                }
             }
         }
     }
@@ -138,10 +138,10 @@ struct StatsView: View {
                 .font(.title2.bold())
                 .foregroundColor(.white)
             HStack(alignment: .bottom, spacing: 8) {
-                ForEach(weekly.indices, id: \.self) { i in
+                ForEach(viewModel.userStats.weeklyProgress.indices, id: \.self) { i in
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color.white.opacity(0.9))
-                        .frame(width: 20, height: CGFloat(weekly[i]) * 100)
+                        .frame(width: 20, height: CGFloat(viewModel.userStats.weeklyProgress[i]) * 100)
                 }
             }
         }
@@ -153,9 +153,15 @@ struct StatsView: View {
                 .font(.title2.bold())
                 .foregroundColor(.white)
             VStack {
-                ActivityItem(icon: "📖", title: "Completed Mathematics Deck", desc: "15 cards • 92%", time: "2h ago", color: Color.blue)
-                ActivityItem(icon: "🔓", title: "Unlocked Instagram", desc: "After session", time: "3h ago", color: Color.green)
-                ActivityItem(icon: "🔥", title: "7-Day Streak", desc: "Great job!", time: "1d ago", color: Color.orange)
+                ForEach(viewModel.userStats.recentActivities) { activity in
+                    ActivityItem(
+                        icon: activity.icon,
+                        title: activity.title,
+                        desc: activity.description,
+                        time: activity.time,
+                        color: Color(activity.color.color)
+                    )
+                }
             }
             .background(
                 RoundedRectangle(cornerRadius: 20).fill(Color.white.opacity(0.9))
