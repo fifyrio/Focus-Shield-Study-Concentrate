@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4E98EFCF2E0D3C7400B6CA18 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 4E98EFCE2E0D3C7400B6CA18 /* RevenueCat */; };
+		4E98EFD22E0D3D2700B6CA18 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 4E98EFD12E0D3D2700B6CA18 /* SQLite */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		4E4D14192E0AB0530063C05A /* focusSheid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = focusSheid.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +28,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E98EFD22E0D3D2700B6CA18 /* SQLite in Frameworks */,
+				4E98EFCF2E0D3C7400B6CA18 /* RevenueCat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +72,8 @@
 			);
 			name = focusSheid;
 			packageProductDependencies = (
+				4E98EFCE2E0D3C7400B6CA18 /* RevenueCat */,
+				4E98EFD12E0D3D2700B6CA18 /* SQLite */,
 			);
 			productName = focusSheid;
 			productReference = 4E4D14192E0AB0530063C05A /* focusSheid.app */;
@@ -94,6 +103,10 @@
 			);
 			mainGroup = 4E4D14102E0AB0530063C05A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4E98EFCD2E0D3C7400B6CA18 /* XCRemoteSwiftPackageReference "purchases-ios" */,
+				4E98EFD02E0D3D2700B6CA18 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4E4D141A2E0AB0530063C05A /* Products */;
 			projectDirPath = "";
@@ -324,6 +337,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4E98EFCD2E0D3C7400B6CA18 /* XCRemoteSwiftPackageReference "purchases-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.30.0;
+			};
+		};
+		4E98EFD02E0D3D2700B6CA18 /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4E98EFCE2E0D3C7400B6CA18 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E98EFCD2E0D3C7400B6CA18 /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCat;
+		};
+		4E98EFD12E0D3D2700B6CA18 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E98EFD02E0D3D2700B6CA18 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			productName = SQLite;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4E4D14112E0AB0530063C05A /* Project object */;
 }
