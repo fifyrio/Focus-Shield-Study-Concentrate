@@ -12,7 +12,11 @@ private struct GlassMorphismCard<Content: View>: View {
             .background(
                 RoundedRectangle(cornerRadius: 25)
                     .fill(Color.white)
-                    .shadow(color: .black.opacity(0.1), radius: 15, x: 0, y: 8)
+                    .shadow(color: .black.opacity(0.05), radius: 12, x: 0, y: 4)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 25)
+                            .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+                    )
             )
     }
 }
@@ -90,8 +94,8 @@ private struct MenuRow<Destination: View>: View {
         Color.white
             .overlay(
                 Rectangle()
-                    .fill(Color.gray.opacity(0.1))
-                    .frame(height: 1),
+                    .fill(Color.gray.opacity(0.06))
+                    .frame(height: 0.5),
                 alignment: .bottom
             )
     }
@@ -100,7 +104,7 @@ private struct MenuRow<Destination: View>: View {
         NavigationLink(destination: destination) {
             rowContent
                 .padding(.horizontal, 20)
-                .padding(.vertical, 20)
+                .padding(.vertical, 18)
                 .background(rowBackground)
                 .scaleEffect(isPressed ? 0.98 : 1.0)
                 .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isPressed)
@@ -195,11 +199,11 @@ struct ProfileView: View {
     private var backgroundGradient: LinearGradient {
         LinearGradient(
             colors: [
-                Color(red: 0.4, green: 0.49, blue: 0.92),
-                Color(red: 0.46, green: 0.29, blue: 0.71)
+                Color(red: 0.96, green: 0.96, blue: 0.97),
+                Color(red: 0.94, green: 0.94, blue: 0.96)
             ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
+            startPoint: .top,
+            endPoint: .bottom
         )
     }
 
@@ -228,33 +232,32 @@ struct ProfileView: View {
         VStack(spacing: 24) {
             profileCard
                 .padding(.horizontal, 20)
-                .offset(y: -30)
+                .offset(y: -20)
             
             PremiumBanner()
                 .padding(.horizontal, 20)
-                .offset(y: -30)
+                .offset(y: -20)
             
             purchaseSection
                 .padding(.horizontal, 20)
-                .offset(y: -30)
+                .offset(y: -20)
             
             generalSection
                 .padding(.horizontal, 20)
-                .offset(y: -30)
+                .offset(y: -20)
         }
-        .padding(.bottom, 120)
+        .padding(.bottom, 100)
     }
 
     private var headerSection: some View {
         VStack(spacing: 8) {
             Text("Profile")
                 .font(.system(size: 32, weight: .bold))
-                .foregroundColor(.white)
-                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 2)
+                .foregroundColor(.primary)
                 .tracking(-0.5)
         }
         .padding(.top, 60)
-        .padding(.bottom, 70)
+        .padding(.bottom, 40)
     }
 
     private var profileCard: some View {
@@ -393,7 +396,7 @@ struct ProfileView: View {
     private func sectionTitle(_ title: String) -> some View {
         Text(title)
             .font(.system(size: 18, weight: .bold))
-            .foregroundColor(.white)
+            .foregroundColor(.primary)
             .padding(.horizontal, 20)
             .padding(.bottom, 16)
     }
@@ -401,7 +404,11 @@ struct ProfileView: View {
     private var sectionBackground: some View {
         RoundedRectangle(cornerRadius: 20)
             .fill(Color.white)
-            .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
+            .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.gray.opacity(0.08), lineWidth: 1)
+            )
     }
 }
 
