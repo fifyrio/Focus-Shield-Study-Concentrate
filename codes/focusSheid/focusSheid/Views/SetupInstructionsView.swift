@@ -12,15 +12,15 @@ struct SetupInstructionsView: View {
             SetupStep(
                 number: 1,
                 title: "Copy Custom Shortcut",
-                description: "Copy the custom shortcut URL for blocking this app",
+                description: "Copy the RS-\(appName.replacingOccurrences(of: " ", with: "")) shortcut URL for later use",
                 actionTitle: "Copy Shortcut",
                 isActionable: true
             ),
             SetupStep(
                 number: 2,
-                title: "Open Shortcuts App",
-                description: "Open the iOS Shortcuts app to create automation",
-                actionTitle: "Open Shortcuts",
+                title: "Create RS-\(appName.replacingOccurrences(of: " ", with: "")) Shortcut",
+                description: "Automatically create and open the RS-\(appName.replacingOccurrences(of: " ", with: "")) shortcut in iOS Shortcuts app",
+                actionTitle: "Create Shortcut",
                 isActionable: true
             ),
             SetupStep(
@@ -46,8 +46,8 @@ struct SetupInstructionsView: View {
             ),
             SetupStep(
                 number: 6,
-                title: "Select the custom shortcut",
-                description: "Add an action, search for 'Run Shortcut', and select the copied shortcut",
+                title: "Select the RS-\(appName.replacingOccurrences(of: " ", with: "")) shortcut",
+                description: "Add an action, search for 'Run Shortcut', and select 'RS-\(appName.replacingOccurrences(of: " ", with: ""))' from the list",
                 actionTitle: nil,
                 isActionable: false
             ),
@@ -235,7 +235,8 @@ struct SetupInstructionsView: View {
     }
     
     private func copyCustomShortcut() {
-        let shortcutURL = "shortcuts://run-shortcut?name=FocusShield-Block-\(appName.replacingOccurrences(of: " ", with: ""))"
+        let shortcutName = "RS-\(appName.replacingOccurrences(of: " ", with: ""))"
+        let shortcutURL = "shortcuts://run-shortcut?name=\(shortcutName)"
         UIPasteboard.general.string = shortcutURL
         isShortcutCopied = true
         
@@ -244,9 +245,60 @@ struct SetupInstructionsView: View {
     }
     
     private func openShortcutsApp() {
-        if let url = URL(string: "shortcuts://") {
-            UIApplication.shared.open(url)
+        createAndOpenShortcut()
+    }
+    
+    private func createAndOpenShortcut() {
+        let shortcutName = "RS-\(appName.replacingOccurrences(of: " ", with: ""))"
+        
+        // Create a shortcut URL that will both create and open the shortcut
+        // This uses the iOS Shortcuts URL scheme to create a new shortcut
+        let createShortcutURL = buildCreateShortcutURL(shortcutName: shortcutName)
+        
+        if let url = URL(string: createShortcutURL) {
+            UIApplication.shared.open(url) { success in
+                if !success {
+                    // Fallback to just opening Shortcuts app
+                    if let fallbackURL = URL(string: "shortcuts://") {
+                        UIApplication.shared.open(fallbackURL)
+                    }
+                }
+            }
         }
+    }
+    
+    private func buildCreateShortcutURL(shortcutName: String) -> String {
+        // Build a URL that creates a shortcut with specific actions
+        // This creates a shortcut that shows a notification when the blocked app is opened
+        
+        let actions = [
+            [
+                "WFWorkflowActionIdentifier": "is.workflow.actions.notification",
+                "WFWorkflowActionParameters": [
+                    "WFNotificationActionTitle": "Focus Shield Active",
+                    "WFNotificationActionBody": "\(appName) is blocked during focus sessions. Complete flashcards to unlock!"
+                ]
+            ],
+            [
+                "WFWorkflowActionIdentifier": "is.workflow.actions.exit",
+                "WFWorkflowActionParameters": [:]
+            ]
+        ]
+        
+        // Convert actions to JSON string
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: actions, options: []),
+              let actionsString = String(data: jsonData, encoding: .utf8) else {
+            // Fallback to simple shortcuts app open
+            return "shortcuts://"
+        }
+        
+        // URL encode the actions
+        let encodedActions = actionsString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        
+        // Create the full URL to create a new shortcut
+        let createURL = "shortcuts://create-shortcut?name=\(shortcutName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? shortcutName)&actions=\(encodedActions)"
+        
+        return createURL
     }
 }
 
