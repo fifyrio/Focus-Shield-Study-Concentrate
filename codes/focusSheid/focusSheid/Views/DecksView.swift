@@ -293,6 +293,8 @@ private struct DeckCard: View {
 
 struct DecksView: View {
     @StateObject private var viewModel = DecksViewModel()
+    @State private var showingDeckEdit = false
+    @State private var editingDeck: Deck? = nil
     
     // Extract complex gradient background
     private func backgroundGradient(geometry: GeometryProxy) -> some View {
@@ -349,6 +351,9 @@ struct DecksView: View {
                 }
             }
             .background(backgroundGradient(geometry: geometry))
+        }
+        .sheet(isPresented: $showingDeckEdit) {
+            DeckEditView(deck: editingDeck)
         }
         #if os(iOS)
         .navigationBarBackButtonHidden(true)
@@ -425,13 +430,8 @@ struct DecksView: View {
             Spacer()
             
             Button(action: {
-                viewModel.addDeck(Deck(
-                    title: "New Deck",
-                    totalCards: 0,
-                    mastered: 0,
-                    color: .blue,
-                    icon: "📚"
-                ))
+                editingDeck = nil
+                showingDeckEdit = true
             }) {
                 Image(systemName: "plus")
                     .font(.system(size: 18, weight: .semibold))
@@ -448,7 +448,14 @@ struct DecksView: View {
         LazyVStack(spacing: 16) {
             ForEach(viewModel.decks) { deck in
                 NavigationLink(destination: FlashcardSessionView(deck: deck)) {
-                    DeckCard(deck: deck)
+                    DeckCard(
+                        deck: deck,
+                        onStudy: nil,
+                        onEdit: {
+                            editingDeck = deck
+                            showingDeckEdit = true
+                        }
+                    )
                 }
                 .buttonStyle(PlainButtonStyle())
             }

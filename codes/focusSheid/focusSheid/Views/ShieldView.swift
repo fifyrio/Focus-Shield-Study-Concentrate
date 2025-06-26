@@ -172,6 +172,7 @@ private struct AppCard: View {
 struct ShieldView: View {
     @StateObject private var viewModel = ShieldViewModel()
     @StateObject private var statsViewModel = StatsViewModel()
+    @State private var showingAppSelection = false
     
     // Extract complex gradient background
     private func backgroundGradient(geometry: GeometryProxy) -> some View {
@@ -229,6 +230,9 @@ struct ShieldView: View {
             }
             .background(backgroundGradient(geometry: geometry))
             .overlay(floatingButton, alignment: .bottomTrailing)
+        }
+        .sheet(isPresented: $showingAppSelection) {
+            AppSelectionView()
         }
         #if os(iOS)
         .navigationBarBackButtonHidden(true)
@@ -367,6 +371,9 @@ struct ShieldView: View {
                 .frame(width: 56, height: 56)
                 .background(floatingButtonBackground)
                 .foregroundColor(.white)
+        }
+        .onLongPressGesture {
+            showingAppSelection = true
         }
         .padding()
         .onReceive(NotificationCenter.default.publisher(for: .unlockApps)) { _ in
