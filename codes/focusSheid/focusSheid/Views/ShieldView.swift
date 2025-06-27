@@ -158,9 +158,12 @@ private struct AppCard: View {
 struct ShieldView: View {
     @StateObject private var viewModel = ShieldViewModel()
     @StateObject private var statsViewModel = StatsViewModel()
+    @StateObject private var deckService = DeckService.shared
     @State private var showingAppSelection = false
     @State private var selectedAppForSetup: AppItem? = nil
     @State private var showingTimer = false
+    @State private var selectedDeck: Deck? = nil
+    @State private var showingDeckEdit = false
     
     // Extract complex gradient background
     private func backgroundGradient(geometry: GeometryProxy) -> some View {
@@ -228,6 +231,9 @@ struct ShieldView: View {
         .fullScreenCover(isPresented: $showingTimer) {
             TimerView()
         }
+        .sheet(isPresented: $showingDeckEdit) {
+            DeckEditView(deck: selectedDeck)
+        }
         #if os(iOS)
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
@@ -267,6 +273,12 @@ struct ShieldView: View {
     private var statusCard: some View {
         GlassMorphismCard {
             statusCardContent
+        }
+        .onTapGesture {
+            if let currentDeck = viewModel.currentDeck {
+                selectedDeck = currentDeck
+                showingDeckEdit = true
+            }
         }
     }
     
@@ -331,10 +343,14 @@ struct ShieldView: View {
         LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 2), spacing: 16) {
             ForEach(viewModel.apps) { app in
                 AppCard(item: app, onTap: {
-                    selectedAppForSetup = app
+                    handleAppTap(app)
                 })
             }
         }
+    }
+    
+    private func handleAppTap(_ app: AppItem) {
+        selectedAppForSetup = app
     }
     
     private var floatingButtonGradient: LinearGradient {
