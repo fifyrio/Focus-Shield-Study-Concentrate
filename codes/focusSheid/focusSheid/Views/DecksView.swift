@@ -267,9 +267,6 @@ private struct DeckCard: View {
             .offset(y: isHovered ? -6 : 0)
             .animation(.easeInOut(duration: 0.4), value: isHovered)
             .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isPressed)
-            .onTapGesture {
-                performTapAnimation()
-            }
             .onLongPressGesture(minimumDuration: 0) {
                 // Handle press state changes
             } onPressingChanged: { pressing in
