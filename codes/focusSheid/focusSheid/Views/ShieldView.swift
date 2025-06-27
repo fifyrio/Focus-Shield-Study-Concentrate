@@ -159,8 +159,8 @@ struct ShieldView: View {
     @StateObject private var viewModel = ShieldViewModel()
     @StateObject private var statsViewModel = StatsViewModel()
     @State private var showingAppSelection = false
-    @State private var showingSetupInstructions = false
     @State private var selectedAppForSetup: AppItem? = nil
+    @State private var showingTimer = false
     
     // Extract complex gradient background
     private func backgroundGradient(geometry: GeometryProxy) -> some View {
@@ -222,10 +222,11 @@ struct ShieldView: View {
         .sheet(isPresented: $showingAppSelection) {
             AppSelectionView()
         }
-        .sheet(isPresented: $showingSetupInstructions) {
-            if let app = selectedAppForSetup {
-                SetupInstructionsView(appName: app.name)
-            }
+        .sheet(item: $selectedAppForSetup) { app in
+            SetupInstructionsView(appName: app.name)
+        }
+        .fullScreenCover(isPresented: $showingTimer) {
+            TimerView()
         }
         #if os(iOS)
         .navigationBarBackButtonHidden(true)
@@ -331,7 +332,6 @@ struct ShieldView: View {
             ForEach(viewModel.apps) { app in
                 AppCard(item: app, onTap: {
                     selectedAppForSetup = app
-                    showingSetupInstructions = true
                 })
             }
         }
@@ -355,12 +355,13 @@ struct ShieldView: View {
     private var floatingButton: some View {
         Button(action: {
             if viewModel.isRunning {
-                viewModel.stopFocusSession()
+                showingTimer = true
             } else {
                 viewModel.startFocusSession()
+                showingTimer = true
             }
         }) {
-            Text(viewModel.isRunning ? "⏸️" : "🎯")
+            Text(viewModel.isRunning ? "⏱️" : "🎯")
                 .font(.title)
                 .frame(width: 56, height: 56)
                 .background(floatingButtonBackground)

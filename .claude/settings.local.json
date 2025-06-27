@@ -6,7 +6,12 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(grep:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git checkout:*)",
+      "Bash(cd /Users/wuwei/Documents/AIApps/Focus-Shield-Study-Concentrate/codes/focusSheid)",
+      "Bash(xcodebuild -scheme focusSheid -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16' build)",
+      "Bash(find . -name \"*.swift\" -exec swiftc -typecheck {})",
+      "Bash(xcrun swiftc:*)"
     ],
     "deny": []
   }
