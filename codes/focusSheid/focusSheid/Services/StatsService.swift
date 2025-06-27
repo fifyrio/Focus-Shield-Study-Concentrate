@@ -2,12 +2,14 @@ import Foundation
 import Combine
 
 class StatsService: ObservableObject {
+    static let shared = StatsService()
+    
     @Published var userStats: UserStats
     
     private let dataService: DataServiceProtocol
     private let statsKey = "userStats"
     
-    init(dataService: DataServiceProtocol = DataService()) {
+    private init(dataService: DataServiceProtocol = DataService()) {
         self.dataService = dataService
         
         if let savedStats: UserStats = dataService.load(UserStats.self, forKey: statsKey) {

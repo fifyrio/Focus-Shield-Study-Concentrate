@@ -15,7 +15,7 @@ class FlashcardSessionViewModel: ObservableObject {
     private let flashcardSessionService: FlashcardSessionService
     private var cancellables = Set<AnyCancellable>()
     
-    init(deck: Deck, statsService: StatsService = StatsService()) {
+    init(deck: Deck, statsService: StatsService = .shared) {
         self.flashcardSessionService = FlashcardSessionService(deck: deck, statsService: statsService)
         setupBindings()
     }

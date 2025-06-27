@@ -11,7 +11,7 @@ class DecksViewModel: ObservableObject {
     private let deckService: DeckService
     private var cancellables = Set<AnyCancellable>()
     
-    init(deckService: DeckService = DeckService()) {
+    init(deckService: DeckService = .shared) {
         self.deckService = deckService
         setupBindings()
     }

@@ -9,7 +9,7 @@ class StatsViewModel: ObservableObject {
     private let statsService: StatsService
     private var cancellables = Set<AnyCancellable>()
     
-    init(statsService: StatsService = StatsService()) {
+    init(statsService: StatsService = .shared) {
         self.statsService = statsService
         setupBindings()
     }

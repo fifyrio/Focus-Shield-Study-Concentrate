@@ -11,7 +11,7 @@ class FlashcardSessionService: ObservableObject {
     private var flashcards: [Flashcard]
     private let statsService: StatsService?
     
-    init(deck: Deck, statsService: StatsService? = nil) {
+    init(deck: Deck, statsService: StatsService? = .shared) {
         self.deck = deck
         self.flashcards = deck.flashcards
         self.statsService = statsService

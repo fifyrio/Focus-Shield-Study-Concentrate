@@ -15,7 +15,7 @@ class ShieldViewModel: ObservableObject {
     
     init(appBlockingService: AppBlockingService = AppBlockingService(),
          focusSessionService: FocusSessionService = FocusSessionService(),
-         deckService: DeckService = DeckService()) {
+         deckService: DeckService = .shared) {
         self.appBlockingService = appBlockingService
         self.focusSessionService = focusSessionService
         self.deckService = deckService

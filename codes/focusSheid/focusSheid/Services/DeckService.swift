@@ -2,13 +2,19 @@ import Foundation
 import SwiftUI
 import Combine
 
+extension Notification.Name {
+    static let decksDidChange = Notification.Name("decksDidChange")
+}
+
 class DeckService: ObservableObject {
+    static let shared = DeckService()
+    
     private let dataService: DataServiceProtocol
     private let decksKey = "userDecks"
     
     @Published var decks: [Deck] = []
     
-    init(dataService: DataServiceProtocol = DataService()) {
+    private init(dataService: DataServiceProtocol = DataService()) {
         self.dataService = dataService
         loadDecks()
     }
@@ -19,6 +25,7 @@ class DeckService: ObservableObject {
         } else {
             setupDefaultDecks()
         }
+        updateStatsAfterChange()
     }
     
     private func setupDefaultDecks() {
@@ -49,6 +56,16 @@ class DeckService: ObservableObject {
     
     private func saveDecks() {
         dataService.save(decks, forKey: decksKey)
+        notifyDecksChanged()
+    }
+    
+    private func notifyDecksChanged() {
+        NotificationCenter.default.post(name: .decksDidChange, object: nil)
+    }
+    
+    private func updateStatsAfterChange() {
+        StatsService.shared.updateCardCount(totalCards)
+        StatsService.shared.updateDeckCount(decks.count)
     }
     
     func addDeck(_ deck: Deck) {
