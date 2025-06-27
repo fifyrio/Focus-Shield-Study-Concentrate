@@ -1,5 +1,22 @@
 # CLAUDE.md
 
+## iOS 项目目录
+
+```
+./codes/focusSheid
+```
+
+## 高保真原型图
+```
+./previewWebs
+```
+
+## UI 线框图
+```
+./sketchs
+```
+
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
@@ -11,7 +28,14 @@ Focus Shield is an iOS application built with SwiftUI that combines focus/produc
 ### Building and Running
 - **Build project**: Open `codes/focusSheid/focusSheid.xcodeproj` in Xcode
 - * 构建并测试
-  `xcodebuild -scheme focusSheid -sdk iphonesimulator \  -destination 'platform=iOS Simulator,name=iPhone 16' build test`
+  ```bash
+  cd codes/focusSheid && \
+  xcodebuild \
+    -scheme focusSheid \
+    -sdk iphonesimulator \
+    -destination id=679BA85A-0E50-4BF4-B5DC-31E0E30E85C3 \
+    clean build
+  ```
 - * 运行 SwiftUI 预览
   直接在 Xcode Canvas 中点击 Resume
 - * 代码风格 & 静态检查
@@ -117,3 +141,45 @@ Additional directories:
 - ViewModels can be unit tested independently
 - Mock data available through ViewModel initializers
 - Business logic separated from UI for easier testing
+
+## 路由系统分析 (Router.swift)
+
+### 文件位置
+`/Root/Router/Router.swift`
+
+### 核心架构
+
+#### RouterPath 类
+```swift
+@MainActor
+public class RouterPath: ObservableObject {
+    @Published public var path: [RouterDestination] = []
+    
+    // 导航方法
+    func navigate(to: RouterDestination)  // 推入新页面
+    func pop()                           // 返回上一页
+    func popToRoot()                     // 返回根页面
+}
+```
+
+**设计特点:**
+- 使用 `@MainActor` 确保线程安全
+- `ObservableObject` + `@Published` 实现响应式 UI 更新
+- 基于栈的导航管理
+
+#### RouterDestination 枚举
+应用支持的所有路由页面：
+
+**主要功能模块:**
+
+### 使用模式
+
+1. **中心化路由**: 所有导航逻辑统一管理
+2. **类型安全**: 编译时检查路由有效性
+3. **参数传递**: 支持携带数据的路由跳转
+4. **SwiftUI 集成**: 完美适配声明式 UI
+
+### 代码规范
+- 所有路由操作必须在主线程执行
+- 新增页面需先在枚举中定义对应 case
+- 参数化路由使用关联值传递数据
