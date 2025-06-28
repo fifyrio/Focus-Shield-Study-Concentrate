@@ -38,12 +38,12 @@ private struct MiniStat: View {
     }
 }
 
-private struct MenuRow<Destination: View>: View {
+private struct ProfileMenuRow: View {
     var icon: String
     var colors: [Color]
     var title: String
     var subtitle: String
-    var destination: Destination
+    let action: () -> Void
     @State private var isPressed = false
     
     private var iconBackground: some View {
@@ -101,7 +101,7 @@ private struct MenuRow<Destination: View>: View {
     }
     
     var body: some View {
-        NavigationLink(destination: destination) {
+        Button(action: action) {
             rowContent
                 .padding(.horizontal, 20)
                 .padding(.vertical, 18)
@@ -167,7 +167,7 @@ private struct PremiumBanner: View {
     
     private var proButton: some View {
         Button("Get Pro") {
-            // Upgrade action
+            // TODO: Implement navigation to upgrade view
         }
         .font(.system(size: 16, weight: .semibold))
         .foregroundColor(Color(red: 0.4, green: 0.49, blue: 0.92))
@@ -195,6 +195,7 @@ private struct PremiumBanner: View {
 }
 
 struct ProfileView: View {
+    @EnvironmentObject private var router: RouterPath
     
     private var backgroundGradient: LinearGradient {
         LinearGradient(
@@ -340,13 +341,14 @@ struct ProfileView: View {
             sectionTitle("Purchase")
             
             VStack(spacing: 0) {
-                MenuRow(
+                ProfileMenuRow(
                     icon: "⭐",
                     colors: [Color(red: 1.0, green: 0.4, blue: 0.6), Color(red: 1.0, green: 0.58, blue: 0.0)],
                     title: "Upgrade to Pro",
-                    subtitle: "Unlock premium features",
-                    destination: UpgradeView()
-                )
+                    subtitle: "Unlock premium features"
+                ) {
+                    router.navigate(to: .upgradeView)
+                }
             }
             .background(sectionBackground)
         }
@@ -357,37 +359,41 @@ struct ProfileView: View {
             sectionTitle("General")
             
             VStack(spacing: 0) {
-                MenuRow(
+                ProfileMenuRow(
                     icon: "🐦",
                     colors: [Color(red: 0.3, green: 0.85, blue: 0.8), Color(red: 0.27, green: 0.63, blue: 0.55)],
                     title: "Follow us on X",
-                    subtitle: "Stay updated with latest features",
-                    destination: SocialLinksView()
-                )
+                    subtitle: "Stay updated with latest features"
+                ) {
+                    router.navigate(to: .socialLinksView)
+                }
                 
-                MenuRow(
+                ProfileMenuRow(
                     icon: "❓",
                     colors: [Color(red: 0.27, green: 0.71, blue: 0.82), Color(red: 0.59, green: 0.79, blue: 0.24)],
                     title: "Help Center",
-                    subtitle: "Get support and answers",
-                    destination: HelpView()
-                )
+                    subtitle: "Get support and answers"
+                ) {
+                    router.navigate(to: .helpView)
+                }
                 
-                MenuRow(
+                ProfileMenuRow(
                     icon: "🔐",
                     colors: [Color(red: 0.94, green: 0.58, blue: 0.98), Color(red: 0.96, green: 0.34, blue: 0.43)],
                     title: "Privacy Policy",
-                    subtitle: "How we protect your data",
-                    destination: PrivacyView()
-                )
+                    subtitle: "How we protect your data"
+                ) {
+                    router.navigate(to: .privacyView)
+                }
                 
-                MenuRow(
+                ProfileMenuRow(
                     icon: "📋",
                     colors: [Color(red: 0.31, green: 0.68, blue: 1.0), Color(red: 0.0, green: 0.95, blue: 1.0)],
                     title: "Terms of Use",
-                    subtitle: "Terms and conditions",
-                    destination: TermsView()
-                )
+                    subtitle: "Terms and conditions"
+                ) {
+                    router.navigate(to: .termsView)
+                }
             }
             .background(sectionBackground)
         }

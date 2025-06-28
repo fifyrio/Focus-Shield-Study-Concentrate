@@ -9,9 +9,9 @@ struct FlashcardEditView: View {
     @State private var showPreview = false
     
     let existingFlashcard: Flashcard?
-    let onSave: (Flashcard) -> Void
+    let onSave: ((Flashcard) -> Void)?
     
-    init(flashcard: Flashcard?, onSave: @escaping (Flashcard) -> Void) {
+    init(flashcard: Flashcard?, onSave: ((Flashcard) -> Void)? = nil) {
         self.existingFlashcard = flashcard
         self.onSave = onSave
         
@@ -206,7 +206,7 @@ struct FlashcardEditView: View {
             answer: answer,
             hint: hint
         )
-        onSave(flashcard)
+        onSave?(flashcard)
         dismiss()
     }
 }

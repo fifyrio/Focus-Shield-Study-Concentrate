@@ -9,6 +9,13 @@
 /* Begin PBXBuildFile section */
 		4E98EFCF2E0D3C7400B6CA18 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 4E98EFCE2E0D3C7400B6CA18 /* RevenueCat */; };
 		4E98EFD22E0D3D2700B6CA18 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 4E98EFD12E0D3D2700B6CA18 /* SQLite */; };
+		4E98F0682E0E753700B6CA18 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 4E98F0672E0E753700B6CA18 /* FirebaseAnalytics */; };
+		4E98F06A2E0E753700B6CA18 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 4E98F0692E0E753700B6CA18 /* FirebaseAuth */; };
+		4E98F06C2E0E753700B6CA18 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 4E98F06B2E0E753700B6CA18 /* FirebaseCore */; };
+		4E98F06E2E0E753700B6CA18 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 4E98F06D2E0E753700B6CA18 /* FirebaseCrashlytics */; };
+		4E98F0702E0E753700B6CA18 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 4E98F06F2E0E753700B6CA18 /* FirebaseRemoteConfig */; };
+		4E98F0722E0E753700B6CA18 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 4E98F0712E0E753700B6CA18 /* FirebaseStorage */; };
+		4E98F0752E0E75A900B6CA18 /* AppsFlyerLib-Static in Frameworks */ = {isa = PBXBuildFile; productRef = 4E98F0742E0E75A900B6CA18 /* AppsFlyerLib-Static */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,7 +36,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				4E98EFD22E0D3D2700B6CA18 /* SQLite in Frameworks */,
+				4E98F06C2E0E753700B6CA18 /* FirebaseCore in Frameworks */,
 				4E98EFCF2E0D3C7400B6CA18 /* RevenueCat in Frameworks */,
+				4E98F0702E0E753700B6CA18 /* FirebaseRemoteConfig in Frameworks */,
+				4E98F06E2E0E753700B6CA18 /* FirebaseCrashlytics in Frameworks */,
+				4E98F0752E0E75A900B6CA18 /* AppsFlyerLib-Static in Frameworks */,
+				4E98F0722E0E753700B6CA18 /* FirebaseStorage in Frameworks */,
+				4E98F0682E0E753700B6CA18 /* FirebaseAnalytics in Frameworks */,
+				4E98F06A2E0E753700B6CA18 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,6 +88,13 @@
 			packageProductDependencies = (
 				4E98EFCE2E0D3C7400B6CA18 /* RevenueCat */,
 				4E98EFD12E0D3D2700B6CA18 /* SQLite */,
+				4E98F0672E0E753700B6CA18 /* FirebaseAnalytics */,
+				4E98F0692E0E753700B6CA18 /* FirebaseAuth */,
+				4E98F06B2E0E753700B6CA18 /* FirebaseCore */,
+				4E98F06D2E0E753700B6CA18 /* FirebaseCrashlytics */,
+				4E98F06F2E0E753700B6CA18 /* FirebaseRemoteConfig */,
+				4E98F0712E0E753700B6CA18 /* FirebaseStorage */,
+				4E98F0742E0E75A900B6CA18 /* AppsFlyerLib-Static */,
 			);
 			productName = focusSheid;
 			productReference = 4E4D14192E0AB0530063C05A /* focusSheid.app */;
@@ -106,6 +127,8 @@
 			packageReferences = (
 				4E98EFCD2E0D3C7400B6CA18 /* XCRemoteSwiftPackageReference "purchases-ios" */,
 				4E98EFD02E0D3D2700B6CA18 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
+				4E98F0662E0E753700B6CA18 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				4E98F0732E0E75A900B6CA18 /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Static" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4E4D141A2E0AB0530063C05A /* Products */;
@@ -355,6 +378,22 @@
 				minimumVersion = 0.15.4;
 			};
 		};
+		4E98F0662E0E753700B6CA18 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.15.0;
+			};
+		};
+		4E98F0732E0E75A900B6CA18 /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Static" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AppsFlyerSDK/AppsFlyerFramework-Static";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.17.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -367,6 +406,41 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4E98EFD02E0D3D2700B6CA18 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
 			productName = SQLite;
+		};
+		4E98F0672E0E753700B6CA18 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E98F0662E0E753700B6CA18 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		4E98F0692E0E753700B6CA18 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E98F0662E0E753700B6CA18 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		4E98F06B2E0E753700B6CA18 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E98F0662E0E753700B6CA18 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		4E98F06D2E0E753700B6CA18 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E98F0662E0E753700B6CA18 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		4E98F06F2E0E753700B6CA18 /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E98F0662E0E753700B6CA18 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseRemoteConfig;
+		};
+		4E98F0712E0E753700B6CA18 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E98F0662E0E753700B6CA18 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+		4E98F0742E0E75A900B6CA18 /* AppsFlyerLib-Static */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E98F0732E0E75A900B6CA18 /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Static" */;
+			productName = "AppsFlyerLib-Static";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

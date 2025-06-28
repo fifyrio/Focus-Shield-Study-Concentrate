@@ -159,11 +159,7 @@ struct ShieldView: View {
     @StateObject private var viewModel = ShieldViewModel()
     @StateObject private var statsViewModel = StatsViewModel()
     @StateObject private var deckService = DeckService.shared
-    @State private var showingAppSelection = false
-    @State private var selectedAppForSetup: AppItem? = nil
-    @State private var showingTimer = false
-    @State private var selectedDeck: Deck? = nil
-    @State private var showingDeckEdit = false
+    @EnvironmentObject private var router: RouterPath
     
     // Extract complex gradient background
     private func backgroundGradient(geometry: GeometryProxy) -> some View {
@@ -222,18 +218,6 @@ struct ShieldView: View {
             .background(backgroundGradient(geometry: geometry))
             .overlay(floatingButton, alignment: .bottomTrailing)
         }
-        .sheet(isPresented: $showingAppSelection) {
-            AppSelectionView()
-        }
-        .sheet(item: $selectedAppForSetup) { app in
-            SetupInstructionsView(appName: app.name)
-        }
-        .fullScreenCover(isPresented: $showingTimer) {
-            TimerView()
-        }
-        .sheet(isPresented: $showingDeckEdit) {
-            DeckEditView(deck: selectedDeck)
-        }
         #if os(iOS)
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
@@ -276,8 +260,7 @@ struct ShieldView: View {
         }
         .onTapGesture {
             if let currentDeck = viewModel.currentDeck {
-                selectedDeck = currentDeck
-                showingDeckEdit = true
+                router.navigate(to: .deckEdit(deck: currentDeck))
             }
         }
     }
@@ -350,7 +333,7 @@ struct ShieldView: View {
     }
     
     private func handleAppTap(_ app: AppItem) {
-        selectedAppForSetup = app
+        router.navigate(to: .setupInstructions(appName: app.name))
     }
     
     private var floatingButtonGradient: LinearGradient {
@@ -371,10 +354,10 @@ struct ShieldView: View {
     private var floatingButton: some View {
         Button(action: {
             if viewModel.isRunning {
-                showingTimer = true
+                router.navigate(to: .timerView)
             } else {
                 viewModel.startFocusSession()
-                showingTimer = true
+                router.navigate(to: .timerView)
             }
         }) {
             Text(viewModel.isRunning ? "⏱️" : "🎯")
@@ -384,7 +367,7 @@ struct ShieldView: View {
                 .foregroundColor(.white)
         }
         .onLongPressGesture {
-            showingAppSelection = true
+            router.navigate(to: .appSelection)
         }
         .padding()
         .onReceive(NotificationCenter.default.publisher(for: .unlockApps)) { _ in

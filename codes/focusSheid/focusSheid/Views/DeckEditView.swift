@@ -3,14 +3,12 @@ import SwiftUI
 struct DeckEditView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var decksViewModel = DecksViewModel()
+    @EnvironmentObject private var router: RouterPath
     
     @State private var deckTitle: String = ""
     @State private var selectedIcon: String = "📚"
     @State private var selectedColor: Color = Color.blue
     @State private var flashcards: [Flashcard] = []
-    @State private var showingFlashcardEdit = false
-    @State private var editingFlashcard: Flashcard?
-    @State private var editingIndex: Int?
     
     let existingDeck: Deck?
     
@@ -68,18 +66,6 @@ struct DeckEditView: View {
                     .disabled(deckTitle.isEmpty)
                 }
             }
-        }
-        .sheet(isPresented: $showingFlashcardEdit) {
-            FlashcardEditView(
-                flashcard: editingFlashcard,
-                onSave: { flashcard in
-                    if let index = editingIndex {
-                        flashcards[index] = flashcard
-                    } else {
-                        flashcards.append(flashcard)
-                    }
-                }
-            )
         }
     }
     
@@ -236,9 +222,19 @@ struct DeckEditView: View {
                 Spacer()
                 
                 Button {
-                    editingFlashcard = nil
-                    editingIndex = nil
-                    showingFlashcardEdit = true
+                    if let deck = existingDeck {
+                        router.navigate(to: .flashcardEdit(deck: deck, flashcard: nil))
+                    } else {
+                        let tempDeck = Deck(
+                            title: deckTitle.isEmpty ? "New Deck" : deckTitle,
+                            totalCards: flashcards.count,
+                            mastered: 0,
+                            color: selectedColor,
+                            icon: selectedIcon,
+                            flashcards: flashcards
+                        )
+                        router.navigate(to: .flashcardEdit(deck: tempDeck, flashcard: nil))
+                    }
                 } label: {
                     Image(systemName: "plus.circle.fill")
                         .font(.title2)
@@ -275,9 +271,19 @@ struct DeckEditView: View {
                             flashcard: flashcards[index],
                             index: index,
                             onEdit: {
-                                editingFlashcard = flashcards[index]
-                                editingIndex = index
-                                showingFlashcardEdit = true
+                                if let deck = existingDeck {
+                                    router.navigate(to: .flashcardEdit(deck: deck, flashcard: flashcards[index]))
+                                } else {
+                                    let tempDeck = Deck(
+                                        title: deckTitle.isEmpty ? "New Deck" : deckTitle,
+                                        totalCards: flashcards.count,
+                                        mastered: 0,
+                                        color: selectedColor,
+                                        icon: selectedIcon,
+                                        flashcards: flashcards
+                                    )
+                                    router.navigate(to: .flashcardEdit(deck: tempDeck, flashcard: flashcards[index]))
+                                }
                             },
                             onDelete: {
                                 flashcards.remove(at: index)

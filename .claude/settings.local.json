@@ -12,7 +12,12 @@
       "Bash(xcodebuild -scheme focusSheid -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16' build)",
       "Bash(find . -name \"*.swift\" -exec swiftc -typecheck {})",
       "Bash(xcrun swiftc:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(swift --version)",
+      "Bash(ls:*)",
+      "Bash(swift:*)",
+      "Bash(timeout 30 xcodebuild:*)",
+      "Bash(timeout 60 xcodebuild:*)"
     ],
     "deny": []
   }

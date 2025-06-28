@@ -1,21 +1,21 @@
 import SwiftUI
 import Foundation
 
-struct Deck: Identifiable, Codable {
-    let id = UUID()
-    var title: String
-    var totalCards: Int
-    var mastered: Int
-    var color: Color
-    var icon: String
-    var flashcards: [Flashcard]
+public struct Deck: Identifiable, Codable, Hashable, Equatable {
+    public let id = UUID()
+    public var title: String
+    public var totalCards: Int
+    public var mastered: Int
+    public var color: Color
+    public var icon: String
+    public var flashcards: [Flashcard]
     
-    var progress: Float {
+    public var progress: Float {
         guard totalCards > 0 else { return 0 }
         return Float(mastered) / Float(totalCards)
     }
     
-    init(title: String, totalCards: Int, mastered: Int, color: Color, icon: String, flashcards: [Flashcard] = []) {
+    public init(title: String, totalCards: Int, mastered: Int, color: Color, icon: String, flashcards: [Flashcard] = []) {
         self.title = title
         self.totalCards = totalCards
         self.mastered = mastered
@@ -29,7 +29,7 @@ struct Deck: Identifiable, Codable {
         case colorData = "color"
     }
     
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         title = try container.decode(String.self, forKey: .title)
         totalCards = try container.decode(Int.self, forKey: .totalCards)
@@ -38,10 +38,14 @@ struct Deck: Identifiable, Codable {
         flashcards = try container.decodeIfPresent([Flashcard].self, forKey: .flashcards) ?? []
         
         let colorData = try container.decode(Data.self, forKey: .colorData)
-        color = try NSKeyedUnarchiver.unarchivedObject(ofClass: UIColor.self, from: colorData)?.swiftUIColor ?? .blue
+        if let uiColor = try NSKeyedUnarchiver.unarchivedObject(ofClass: UIColor.self, from: colorData) {
+            color = Color(uiColor)
+        } else {
+            color = .blue
+        }
     }
     
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(title, forKey: .title)
         try container.encode(totalCards, forKey: .totalCards)
@@ -52,5 +56,13 @@ struct Deck: Identifiable, Codable {
         let uiColor = UIColor(color)
         let colorData = try NSKeyedArchiver.archivedData(withRootObject: uiColor, requiringSecureCoding: false)
         try container.encode(colorData, forKey: .colorData)
+    }
+    
+    public static func == (lhs: Deck, rhs: Deck) -> Bool {
+        return lhs.id == rhs.id
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }

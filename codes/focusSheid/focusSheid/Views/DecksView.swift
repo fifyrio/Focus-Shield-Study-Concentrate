@@ -290,8 +290,7 @@ private struct DeckCard: View {
 
 struct DecksView: View {
     @StateObject private var viewModel = DecksViewModel()
-    @State private var showingDeckEdit = false
-    @State private var editingDeck: Deck? = nil
+    @EnvironmentObject private var router: RouterPath
     
     // Extract complex gradient background
     private func backgroundGradient(geometry: GeometryProxy) -> some View {
@@ -348,9 +347,6 @@ struct DecksView: View {
                 }
             }
             .background(backgroundGradient(geometry: geometry))
-        }
-        .sheet(isPresented: $showingDeckEdit) {
-            DeckEditView(deck: editingDeck)
         }
         #if os(iOS)
         .navigationBarBackButtonHidden(true)
@@ -427,8 +423,7 @@ struct DecksView: View {
             Spacer()
             
             Button(action: {
-                editingDeck = nil
-                showingDeckEdit = true
+                router.navigate(to: .deckEdit(deck: nil))
             }) {
                 Image(systemName: "plus")
                     .font(.system(size: 18, weight: .semibold))
@@ -444,17 +439,15 @@ struct DecksView: View {
     private var decksList: some View {
         LazyVStack(spacing: 16) {
             ForEach(viewModel.decks) { deck in
-                NavigationLink(destination: FlashcardSessionView(deck: deck)) {
-                    DeckCard(
-                        deck: deck,
-                        onStudy: nil,
-                        onEdit: {
-                            editingDeck = deck
-                            showingDeckEdit = true
-                        }
-                    )
-                }
-                .buttonStyle(PlainButtonStyle())
+                DeckCard(
+                    deck: deck,
+                    onStudy: {
+                        router.navigate(to: .flashcardSession(deck: deck))
+                    },
+                    onEdit: {
+                        router.navigate(to: .deckEdit(deck: deck))
+                    }
+                )
             }
         }
     }
