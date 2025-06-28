@@ -2,13 +2,14 @@ import SwiftUI
 import Foundation
 
 struct AppItem: Identifiable, Codable {
-    let id = UUID()
+    let id: UUID
     var name: String
     var icon: String
     var color: Color
     var blocked: Bool
     
     init(name: String, icon: String, color: Color, blocked: Bool = true) {
+        self.id = UUID()
         self.name = name
         self.icon = icon
         self.color = color
@@ -16,12 +17,13 @@ struct AppItem: Identifiable, Codable {
     }
     
     enum CodingKeys: String, CodingKey {
-        case name, icon, blocked
+        case id, name, icon, blocked
         case colorData = "color"
     }
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         icon = try container.decode(String.self, forKey: .icon)
         blocked = try container.decode(Bool.self, forKey: .blocked)
@@ -32,6 +34,7 @@ struct AppItem: Identifiable, Codable {
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(icon, forKey: .icon)
         try container.encode(blocked, forKey: .blocked)

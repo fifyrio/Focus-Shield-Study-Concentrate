@@ -160,6 +160,8 @@ struct ShieldView: View {
     @StateObject private var statsViewModel = StatsViewModel()
     @StateObject private var deckService = DeckService.shared
     @EnvironmentObject private var router: RouterPath
+    @State private var showingDeckEdit = false
+    @State private var editingDeck: Deck? = nil
     
     // Extract complex gradient background
     private func backgroundGradient(geometry: GeometryProxy) -> some View {
@@ -260,7 +262,8 @@ struct ShieldView: View {
         }
         .onTapGesture {
             if let currentDeck = viewModel.currentDeck {
-                router.navigate(to: .deckEdit(deck: currentDeck))
+                editingDeck = currentDeck
+                showingDeckEdit = true
             }
         }
     }
@@ -372,6 +375,9 @@ struct ShieldView: View {
         .padding()
         .onReceive(NotificationCenter.default.publisher(for: .unlockApps)) { _ in
             viewModel.unlockAppsAfterStudy()
+        }
+        .sheet(isPresented: $showingDeckEdit) {
+            DeckEditView(deck: editingDeck)
         }
     }
 }

@@ -26,7 +26,6 @@ public enum RouterDestination: Hashable, Equatable {
     
     // Flashcard System
     case flashcardSession(deck: Deck)
-    case deckEdit(deck: Deck?)
     case flashcardEdit(deck: Deck, flashcard: Flashcard?)
     
     // App Management
@@ -46,8 +45,6 @@ public enum RouterDestination: Hashable, Equatable {
             return true
         case (.flashcardSession(let lhsDeck), .flashcardSession(let rhsDeck)):
             return lhsDeck.id == rhsDeck.id
-        case (.deckEdit(let lhsDeck), .deckEdit(let rhsDeck)):
-            return lhsDeck?.id == rhsDeck?.id
         case (.flashcardEdit(let lhsDeck, let lhsCard), .flashcardEdit(let rhsDeck, let rhsCard)):
             return lhsDeck.id == rhsDeck.id && lhsCard?.id == rhsCard?.id
         case (.appSelection, .appSelection):
@@ -76,9 +73,6 @@ public enum RouterDestination: Hashable, Equatable {
         case .flashcardSession(let deck):
             hasher.combine("flashcardSession")
             hasher.combine(deck.id)
-        case .deckEdit(let deck):
-            hasher.combine("deckEdit")
-            hasher.combine(deck?.id)
         case .flashcardEdit(let deck, let flashcard):
             hasher.combine("flashcardEdit")
             hasher.combine(deck.id)
@@ -115,9 +109,6 @@ extension View {
                 
             case .flashcardSession(let deck):
                 FlashcardSessionView(deck: deck)
-                
-            case .deckEdit(let deck):
-                DeckEditView(deck: deck)
                 
             case .flashcardEdit(let deck, let flashcard):
                 FlashcardEditView(flashcard: flashcard, onSave: nil)

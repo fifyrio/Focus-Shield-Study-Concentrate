@@ -1,5 +1,5 @@
 import Foundation
-import UIKit
+import SwiftUI
 
 struct UserStats: Codable {
     var totalCards: Int = 0
@@ -34,12 +34,13 @@ struct UserStats: Codable {
 }
 
 struct Achievement: Identifiable, Codable {
-    let id = UUID()
+    let id: UUID
     let title: String
     let icon: String
     let unlocked: Bool
     
     init(title: String, icon: String, unlocked: Bool) {
+        self.id = UUID()
         self.title = title
         self.icon = icon
         self.unlocked = unlocked
@@ -47,7 +48,7 @@ struct Achievement: Identifiable, Codable {
 }
 
 struct Activity: Identifiable, Codable {
-    let id = UUID()
+    let id: UUID
     let icon: String
     let title: String
     let description: String
@@ -55,6 +56,7 @@ struct Activity: Identifiable, Codable {
     let color: ColorData
     
     init(icon: String, title: String, description: String, time: String, color: ColorData) {
+        self.id = UUID()
         self.icon = icon
         self.title = title
         self.description = description
@@ -66,14 +68,14 @@ struct Activity: Identifiable, Codable {
 enum ColorData: String, Codable, CaseIterable {
     case blue, green, orange, red, purple, yellow
     
-    var color: UIColor {
+    var color: Color {
         switch self {
-        case .blue: return .systemBlue
-        case .green: return .systemGreen
-        case .orange: return .systemOrange
-        case .red: return .systemRed
-        case .purple: return .systemPurple
-        case .yellow: return .systemYellow
+        case .blue: return .blue
+        case .green: return .green
+        case .orange: return .orange
+        case .red: return .red
+        case .purple: return .purple
+        case .yellow: return .yellow
         }
     }
 }

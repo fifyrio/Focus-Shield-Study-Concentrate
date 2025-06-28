@@ -1,11 +1,16 @@
 import SwiftUI
 
+// MARK: - Simplified Color Palette
+private let brandPrimary = Color(red: 0.4, green: 0.49, blue: 0.92)
+private let brandSecondary = Color(red: 0.46, green: 0.29, blue: 0.71)
+private let successColor = Color(red: 0.2, green: 0.78, blue: 0.35)
+
 struct UpgradeView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedPlan: PricingPlan = .yearly
     
-    private let purpleGradient = LinearGradient(
-        colors: [Color(red: 0.4, green: 0.49, blue: 0.92), Color(red: 0.7, green: 0.6, blue: 0.98)],
+    private let brandGradient = LinearGradient(
+        colors: [brandPrimary, brandSecondary],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
@@ -23,7 +28,7 @@ struct UpgradeView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
-            .background(Color.gray.opacity(0.1))
+            .background(Color(red: 0.96, green: 0.96, blue: 0.97))
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -55,11 +60,7 @@ struct UpgradeView: View {
                     .padding(.vertical, 12)
                     .background(
                         RoundedRectangle(cornerRadius: 25)
-                            .fill(LinearGradient(
-                                colors: [Color(red: 0.3, green: 0.6, blue: 0.7), Color(red: 0.2, green: 0.5, blue: 0.6)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            ))
+                            .fill(LinearGradient(colors: [successColor, successColor.opacity(0.8)], startPoint: .leading, endPoint: .trailing))
                     )
                     .multilineTextAlignment(.center)
             }
@@ -74,21 +75,21 @@ struct UpgradeView: View {
                 icon: "sparkles",
                 title: "Generate unlimited flashcards",
                 subtitle: "Upload your lecture material to automatically generate flashcards",
-                gradientColors: [Color(red: 0.4, green: 0.49, blue: 0.92), Color(red: 0.0, green: 0.8, blue: 0.7)]
+                gradientColors: [brandPrimary, successColor]
             )
             
             FeatureRow(
                 icon: "lock.fill",
                 title: "Earn your scroll",
                 subtitle: "Force yourself to study by locking apps until you have completed your flashcards",
-                gradientColors: [Color(red: 0.0, green: 0.8, blue: 0.7), Color(red: 0.4, green: 0.9, blue: 0.8)]
+                gradientColors: [successColor, successColor.opacity(0.7)]
             )
             
             FeatureRow(
                 icon: "star.fill",
                 title: "Study smarter and not harder",
                 subtitle: "Stay focused for longer and study more. Using your social media addiction...",
-                gradientColors: [Color(red: 0.4, green: 0.9, blue: 0.8), Color(red: 0.6, green: 1.0, blue: 0.9)]
+                gradientColors: [brandSecondary, brandSecondary.opacity(0.7)]
             )
         }
         .padding(.bottom, 40)
@@ -136,11 +137,7 @@ struct UpgradeView: View {
                 .frame(height: 56)
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(LinearGradient(
-                            colors: [Color(red: 0.3, green: 0.6, blue: 0.7), Color(red: 0.2, green: 0.5, blue: 0.6)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        ))
+                        .fill(brandGradient)
                 )
         }
         .padding(.bottom, 24)
@@ -152,19 +149,19 @@ struct UpgradeView: View {
                 // Handle restore
             }
             .font(.system(size: 14, weight: .medium))
-            .foregroundColor(Color(red: 0.4, green: 0.49, blue: 0.92))
+            .foregroundColor(brandPrimary)
             
             Button("Terms") {
                 // Handle terms
             }
             .font(.system(size: 14, weight: .medium))
-            .foregroundColor(Color(red: 0.4, green: 0.49, blue: 0.92))
+            .foregroundColor(brandPrimary)
             
             Button("Privacy") {
                 // Handle privacy
             }
             .font(.system(size: 14, weight: .medium))
-            .foregroundColor(Color(red: 0.4, green: 0.49, blue: 0.92))
+            .foregroundColor(brandPrimary)
         }
     }
 }
@@ -268,11 +265,7 @@ struct PricingCard: View {
                         .padding(.vertical, 4)
                         .background(
                             RoundedRectangle(cornerRadius: 8)
-                                .fill(LinearGradient(
-                                    colors: [Color(red: 0.3, green: 0.6, blue: 0.7), Color(red: 0.2, green: 0.5, blue: 0.6)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                ))
+                                .fill(LinearGradient(colors: [successColor, successColor.opacity(0.8)], startPoint: .leading, endPoint: .trailing))
                         )
                         .offset(y: -8)
                 }
@@ -297,12 +290,12 @@ struct PricingCard: View {
                         
                         ZStack {
                             Circle()
-                                .stroke(isSelected ? Color(red: 0.4, green: 0.49, blue: 0.92) : Color.secondary.opacity(0.3), lineWidth: 2)
+                                .stroke(isSelected ? brandPrimary : Color.secondary.opacity(0.3), lineWidth: 2)
                                 .frame(width: 24, height: 24)
                             
                             if isSelected {
                                 Circle()
-                                    .fill(Color(red: 0.4, green: 0.49, blue: 0.92))
+                                    .fill(brandPrimary)
                                     .frame(width: 16, height: 16)
                                 
                                 Image(systemName: "checkmark")
@@ -319,7 +312,7 @@ struct PricingCard: View {
                     .fill(Color.white)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(isSelected ? Color(red: 0.4, green: 0.49, blue: 0.92) : Color.clear, lineWidth: 2)
+                            .stroke(isSelected ? brandPrimary : Color.clear, lineWidth: 2)
                     )
             )
         }

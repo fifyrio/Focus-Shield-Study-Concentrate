@@ -1,7 +1,7 @@
 import Foundation
 
 public struct Flashcard: Identifiable, Codable, Hashable, Equatable {
-    public let id = UUID()
+    public let id: UUID
     public var prompt: String
     public var answer: String
     public var hint: String
@@ -10,6 +10,7 @@ public struct Flashcard: Identifiable, Codable, Hashable, Equatable {
     public var lastReviewed: Date?
     
     public init(prompt: String, answer: String, hint: String = "") {
+        self.id = UUID()
         self.prompt = prompt
         self.answer = answer
         self.hint = hint

@@ -2,7 +2,7 @@ import SwiftUI
 import Foundation
 
 public struct Deck: Identifiable, Codable, Hashable, Equatable {
-    public let id = UUID()
+    public let id: UUID
     public var title: String
     public var totalCards: Int
     public var mastered: Int
@@ -16,6 +16,7 @@ public struct Deck: Identifiable, Codable, Hashable, Equatable {
     }
     
     public init(title: String, totalCards: Int, mastered: Int, color: Color, icon: String, flashcards: [Flashcard] = []) {
+        self.id = UUID()
         self.title = title
         self.totalCards = totalCards
         self.mastered = mastered
@@ -25,12 +26,13 @@ public struct Deck: Identifiable, Codable, Hashable, Equatable {
     }
     
     enum CodingKeys: String, CodingKey {
-        case title, totalCards, mastered, icon, flashcards
+        case id, title, totalCards, mastered, icon, flashcards
         case colorData = "color"
     }
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
         title = try container.decode(String.self, forKey: .title)
         totalCards = try container.decode(Int.self, forKey: .totalCards)
         mastered = try container.decode(Int.self, forKey: .mastered)
@@ -47,6 +49,7 @@ public struct Deck: Identifiable, Codable, Hashable, Equatable {
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
         try container.encode(title, forKey: .title)
         try container.encode(totalCards, forKey: .totalCards)
         try container.encode(mastered, forKey: .mastered)

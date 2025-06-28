@@ -291,6 +291,8 @@ private struct DeckCard: View {
 struct DecksView: View {
     @StateObject private var viewModel = DecksViewModel()
     @EnvironmentObject private var router: RouterPath
+    @State private var showingDeckEdit = false
+    @State private var editingDeck: Deck? = nil
     
     // Extract complex gradient background
     private func backgroundGradient(geometry: GeometryProxy) -> some View {
@@ -352,6 +354,9 @@ struct DecksView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         #endif
+        .sheet(isPresented: $showingDeckEdit) {
+            DeckEditView(deck: editingDeck)
+        }
     }
     
     private var contentSection: some View {
@@ -423,7 +428,8 @@ struct DecksView: View {
             Spacer()
             
             Button(action: {
-                router.navigate(to: .deckEdit(deck: nil))
+                editingDeck = nil
+                showingDeckEdit = true
             }) {
                 Image(systemName: "plus")
                     .font(.system(size: 18, weight: .semibold))
@@ -445,7 +451,8 @@ struct DecksView: View {
                         router.navigate(to: .flashcardSession(deck: deck))
                     },
                     onEdit: {
-                        router.navigate(to: .deckEdit(deck: deck))
+                        editingDeck = deck
+                        showingDeckEdit = true
                     }
                 )
             }
