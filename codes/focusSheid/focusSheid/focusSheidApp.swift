@@ -18,6 +18,7 @@ struct FocusShieldApp: App {
             RootView()
                 .environmentObject(appState)
                 .environmentObject(routerPath)
+                .preferredColorScheme(.light)
         }
     }
 }
