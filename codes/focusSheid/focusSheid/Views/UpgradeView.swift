@@ -1,19 +1,9 @@
 import SwiftUI
 
-// MARK: - Simplified Color Palette
-private let brandPrimary = Color(red: 0.4, green: 0.49, blue: 0.92)
-private let brandSecondary = Color(red: 0.46, green: 0.29, blue: 0.71)
-private let successColor = Color(red: 0.2, green: 0.78, blue: 0.35)
-
 struct UpgradeView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var selectedPlan: PricingPlan = .yearly
+    @StateObject private var viewModel = UpgradeViewModel()
     
-    private let brandGradient = LinearGradient(
-        colors: [brandPrimary, brandSecondary],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-    )
     
     var body: some View {
         GeometryReader { geometry in
@@ -28,7 +18,7 @@ struct UpgradeView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
-            .background(Color(red: 0.96, green: 0.96, blue: 0.97))
+            .background(Color.backgroundPrimary)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -47,20 +37,20 @@ struct UpgradeView: View {
     private var headerSection: some View {
         VStack(spacing: 16) {
             VStack(spacing: 8) {
-                Text("80% of students who sign up study more in the first week.")
+                Text(viewModel.headerTitle)
                     .font(.system(size: 28, weight: .bold, design: .default))
                     .multilineTextAlignment(.center)
                     .foregroundColor(.primary)
                     .lineLimit(nil)
                 
-                Text("Study an extra 11 hours each week for less than a coffee!")
+                Text(viewModel.headerSubtitle)
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(.white)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                     .background(
                         RoundedRectangle(cornerRadius: 25)
-                            .fill(LinearGradient(colors: [successColor, successColor.opacity(0.8)], startPoint: .leading, endPoint: .trailing))
+                            .fill(LinearGradient.success)
                     )
                     .multilineTextAlignment(.center)
             }
@@ -71,26 +61,14 @@ struct UpgradeView: View {
     
     private var featuresSection: some View {
         VStack(spacing: 0) {
-            FeatureRow(
-                icon: "sparkles",
-                title: "Generate unlimited flashcards",
-                subtitle: "Upload your lecture material to automatically generate flashcards",
-                gradientColors: [brandPrimary, successColor]
-            )
-            
-            FeatureRow(
-                icon: "lock.fill",
-                title: "Earn your scroll",
-                subtitle: "Force yourself to study by locking apps until you have completed your flashcards",
-                gradientColors: [successColor, successColor.opacity(0.7)]
-            )
-            
-            FeatureRow(
-                icon: "star.fill",
-                title: "Study smarter and not harder",
-                subtitle: "Stay focused for longer and study more. Using your social media addiction...",
-                gradientColors: [brandSecondary, brandSecondary.opacity(0.7)]
-            )
+            ForEach(viewModel.features) { feature in
+                FeatureRow(
+                    icon: feature.icon,
+                    title: feature.title,
+                    subtitle: feature.subtitle,
+                    gradientColors: feature.gradientColors
+                )
+            }
         }
         .padding(.bottom, 40)
     }
@@ -101,25 +79,20 @@ struct UpgradeView: View {
                 Image(systemName: "checkmark")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.green)
-                Text("Cancel Anytime")
+                Text(viewModel.cancelAnytimeText)
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(.secondary)
             }
             
             HStack(spacing: 12) {
-                PricingCard(
-                    plan: .yearly,
-                    isSelected: selectedPlan == .yearly,
-                    badgeText: "3-Day Free Trial"
-                ) {
-                    selectedPlan = .yearly
-                }
-                
-                PricingCard(
-                    plan: .monthly,
-                    isSelected: selectedPlan == .monthly
-                ) {
-                    selectedPlan = .monthly
+                ForEach(PricingPlan.allCases, id: \.self) { plan in
+                    PricingCard(
+                        plan: plan,
+                        isSelected: viewModel.selectedPlan == plan,
+                        badgeText: plan.badgeText
+                    ) {
+                        viewModel.selectPlan(plan)
+                    }
                 }
             }
         }
@@ -128,40 +101,64 @@ struct UpgradeView: View {
     
     private var continueButton: some View {
         Button {
-            // Handle purchase
+            viewModel.purchaseSelectedPlan()
         } label: {
-            Text("Continue")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(brandGradient)
-                )
+            HStack {
+                if viewModel.isLoading {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                        .tint(.white)
+                }
+                Text(viewModel.continueButtonText)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.white)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 56)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(LinearGradient.brandPrimary)
+                    .opacity(viewModel.isButtonDisabled ? 0.6 : 1.0)
+            )
         }
+        .disabled(viewModel.isButtonDisabled)
         .padding(.bottom, 24)
     }
     
     private var footerLinks: some View {
         HStack(spacing: 40) {
             Button("Restore Purchases") {
-                // Handle restore
+                viewModel.restorePurchases()
             }
             .font(.system(size: 14, weight: .medium))
-            .foregroundColor(brandPrimary)
+            .foregroundColor(.brandPrimary)
+            .disabled(viewModel.isLoading)
             
             Button("Terms") {
-                // Handle terms
+                viewModel.showTerms()
             }
             .font(.system(size: 14, weight: .medium))
-            .foregroundColor(brandPrimary)
+            .foregroundColor(.brandPrimary)
             
             Button("Privacy") {
-                // Handle privacy
+                viewModel.showPrivacyPolicy()
             }
             .font(.system(size: 14, weight: .medium))
-            .foregroundColor(brandPrimary)
+            .foregroundColor(.brandPrimary)
+        }
+        .alert("Purchase Error", isPresented: $viewModel.showingError) {
+            Button("OK") {
+                viewModel.dismissError()
+            }
+        } message: {
+            Text(viewModel.purchaseError ?? "An error occurred")
+        }
+        .alert("Purchase Successful!", isPresented: $viewModel.isPurchaseSuccessful) {
+            Button("Continue") {
+                dismiss()
+            }
+        } message: {
+            Text("Welcome to Premium! Enjoy unlimited access to all features.")
         }
     }
 }
@@ -216,30 +213,6 @@ struct FeatureRow: View {
     }
 }
 
-enum PricingPlan: CaseIterable {
-    case yearly, monthly
-    
-    var title: String {
-        switch self {
-        case .yearly: return "Yearly"
-        case .monthly: return "Monthly"
-        }
-    }
-    
-    var price: String {
-        switch self {
-        case .yearly: return "¥14.00/mo"
-        case .monthly: return "¥38.00/mo"
-        }
-    }
-    
-    var billingInfo: String {
-        switch self {
-        case .yearly: return "Billed at ¥168.00/yr."
-        case .monthly: return "Billed at ¥38.00/mo."
-        }
-    }
-}
 
 struct PricingCard: View {
     let plan: PricingPlan
@@ -265,7 +238,7 @@ struct PricingCard: View {
                         .padding(.vertical, 4)
                         .background(
                             RoundedRectangle(cornerRadius: 8)
-                                .fill(LinearGradient(colors: [successColor, successColor.opacity(0.8)], startPoint: .leading, endPoint: .trailing))
+                                .fill(LinearGradient.success)
                         )
                         .offset(y: -8)
                 }
@@ -290,12 +263,12 @@ struct PricingCard: View {
                         
                         ZStack {
                             Circle()
-                                .stroke(isSelected ? brandPrimary : Color.secondary.opacity(0.3), lineWidth: 2)
+                                .stroke(isSelected ? Color.brandPrimary : Color.secondary.opacity(0.3), lineWidth: 2)
                                 .frame(width: 24, height: 24)
                             
                             if isSelected {
                                 Circle()
-                                    .fill(brandPrimary)
+                                    .fill(Color.brandPrimary)
                                     .frame(width: 16, height: 16)
                                 
                                 Image(systemName: "checkmark")
@@ -312,7 +285,7 @@ struct PricingCard: View {
                     .fill(Color.white)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(isSelected ? brandPrimary : Color.clear, lineWidth: 2)
+                            .stroke(isSelected ? Color.brandPrimary : Color.clear, lineWidth: 2)
                     )
             )
         }
