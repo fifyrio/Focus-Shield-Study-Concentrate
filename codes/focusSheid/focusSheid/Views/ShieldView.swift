@@ -1,54 +1,15 @@
 import SwiftUI
 
-private struct GlassMorphismCard<Content: View>: View {
-    let content: Content
-    
-    init(@ViewBuilder content: () -> Content) {
-        self.content = content()
-    }
-    
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 24)
-            .fill(Color.white.opacity(0.95))
-            .background(
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(.ultraThinMaterial)
-            )
-    }
-    
-    private var cardShadows: some View {
-        cardBackground
-            .shadow(color: .black.opacity(0.12), radius: 32, x: 0, y: 8)
-            .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
-    }
-    
-    private var cardBorder: some View {
-        RoundedRectangle(cornerRadius: 24)
-            .stroke(Color.white.opacity(0.2), lineWidth: 1)
-    }
-    
-    var body: some View {
-        content
-            .background(
-                cardShadows
-                    .overlay(cardBorder)
-            )
-    }
-}
 
 private struct PulsingDot: View {
     @State private var isPulsing = false
     
     private var dotGradient: LinearGradient {
-        LinearGradient(
-            colors: [Color(red: 0.2, green: 0.78, blue: 0.35), Color(red: 0.19, green: 0.82, blue: 0.35)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        LinearGradient.successPulsing
     }
     
     private var pulseShadow: Color {
-        Color(red: 0.2, green: 0.78, blue: 0.35).opacity(0.4)
+        Color.success.opacity(0.4)
     }
     
     var body: some View {
@@ -163,48 +124,12 @@ struct ShieldView: View {
     @State private var showingDeckEdit = false
     @State private var editingDeck: Deck? = nil
     
-    // Extract complex gradient background
     private func backgroundGradient(geometry: GeometryProxy) -> some View {
-        LinearGradient(
-            colors: [
-                Color(red: 0.4, green: 0.49, blue: 0.92),
-                Color(red: 0.46, green: 0.29, blue: 0.71),
-                Color(red: 0.4, green: 0.49, blue: 0.92)
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        .overlay(radialOverlay1(geometry: geometry))
-        .overlay(radialOverlay2(geometry: geometry))
-        .overlay(radialOverlay3(geometry: geometry))
+        LinearGradient.backgroundShield
+        .overlay(RadialGradient.whiteOverlay(center: UnitPoint(x: 0.2, y: 0.2), radius: geometry.size.width * 0.5))
+        .overlay(RadialGradient.mediumWhiteOverlay(center: UnitPoint(x: 0.8, y: 0.4), radius: geometry.size.width * 0.5))
+        .overlay(RadialGradient.lightWhiteOverlay(center: UnitPoint(x: 0.4, y: 0.8), radius: geometry.size.width * 0.5))
         .ignoresSafeArea()
-    }
-    
-    private func radialOverlay1(geometry: GeometryProxy) -> some View {
-        RadialGradient(
-            colors: [Color.white.opacity(0.1), Color.clear],
-            center: UnitPoint(x: 0.2, y: 0.2),
-            startRadius: 0,
-            endRadius: geometry.size.width * 0.5
-        )
-    }
-    
-    private func radialOverlay2(geometry: GeometryProxy) -> some View {
-        RadialGradient(
-            colors: [Color.white.opacity(0.08), Color.clear],
-            center: UnitPoint(x: 0.8, y: 0.4),
-            startRadius: 0,
-            endRadius: geometry.size.width * 0.5
-        )
-    }
-    
-    private func radialOverlay3(geometry: GeometryProxy) -> some View {
-        RadialGradient(
-            colors: [Color.white.opacity(0.06), Color.clear],
-            center: UnitPoint(x: 0.4, y: 0.8),
-            startRadius: 0,
-            endRadius: geometry.size.width * 0.5
-        )
     }
 
     var body: some View {
@@ -257,15 +182,14 @@ struct ShieldView: View {
     }
 
     private var statusCard: some View {
-        GlassMorphismCard {
-            statusCardContent
-        }
-        .onTapGesture {
-            if let currentDeck = viewModel.currentDeck {
-                editingDeck = currentDeck
-                showingDeckEdit = true
+        statusCardContent
+            .glassCard()
+            .onTapGesture {
+                if let currentDeck = viewModel.currentDeck {
+                    editingDeck = currentDeck
+                    showingDeckEdit = true
+                }
             }
-        }
     }
     
     private var statusCardContent: some View {
@@ -284,7 +208,7 @@ struct ShieldView: View {
             PulsingDot()
             Text(viewModel.isRunning ? "Active" : "Inactive")
                 .font(.system(size: 19, weight: .semibold))
-                .foregroundColor(viewModel.isRunning ? Color(red: 0.2, green: 0.78, blue: 0.35) : .gray)
+                .foregroundColor(viewModel.isRunning ? Color.success : .gray)
                 .tracking(-0.2)
         }
     }
@@ -304,11 +228,7 @@ struct ShieldView: View {
     }
     
     private var unlockMessageGradient: LinearGradient {
-        LinearGradient(
-            colors: [Color(red: 1.0, green: 0.58, blue: 0.0), Color(red: 1.0, green: 0.42, blue: 0.21)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        LinearGradient.warning
     }
     
     private var unlockMessage: some View {
@@ -320,7 +240,7 @@ struct ShieldView: View {
             .background(
                 RoundedRectangle(cornerRadius: 16)
                     .fill(unlockMessageGradient)
-                    .shadow(color: Color(red: 1.0, green: 0.58, blue: 0.0).opacity(0.3), radius: 16, x: 0, y: 4)
+                    .shadow(color: Color.warning.opacity(0.3), radius: 16, x: 0, y: 4)
             )
             .tracking(0.1)
     }
@@ -339,19 +259,8 @@ struct ShieldView: View {
         router.navigate(to: .setupInstructions(appName: app.name))
     }
     
-    private var floatingButtonGradient: LinearGradient {
-        LinearGradient(
-            colors: [Color(red: 0.0, green: 0.48, blue: 1.0), Color(red: 0.35, green: 0.34, blue: 0.84)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-    
     private var floatingButtonBackground: some View {
-        Circle()
-            .fill(floatingButtonGradient)
-            .shadow(color: Color(red: 0.0, green: 0.48, blue: 1.0).opacity(0.3), radius: 12, x: 0, y: 6)
-            .shadow(color: Color(red: 0.0, green: 0.48, blue: 1.0).opacity(0.4), radius: 16, x: 0, y: 4)
+        Color.clear
     }
 
     private var floatingButton: some View {
@@ -366,7 +275,7 @@ struct ShieldView: View {
             Text(viewModel.isRunning ? "⏱️" : "🎯")
                 .font(.title)
                 .frame(width: 56, height: 56)
-                .background(floatingButtonBackground)
+                .floatingButtonStyle()
                 .foregroundColor(.white)
         }
         .onLongPressGesture {

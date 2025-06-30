@@ -1,25 +1,5 @@
 import SwiftUI
 
-private struct GlassMorphismCard<Content: View>: View {
-    let content: Content
-    
-    init(@ViewBuilder content: () -> Content) {
-        self.content = content()
-    }
-    
-    var body: some View {
-        content
-            .background(
-                RoundedRectangle(cornerRadius: 25)
-                    .fill(Color.white)
-                    .shadow(color: .black.opacity(0.05), radius: 12, x: 0, y: 4)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 25)
-                            .stroke(Color.gray.opacity(0.1), lineWidth: 1)
-                    )
-            )
-    }
-}
 
 private struct MiniStat: View {
     var number: String
@@ -29,7 +9,7 @@ private struct MiniStat: View {
         VStack(spacing: 4) {
             Text(number)
                 .font(.system(size: 20, weight: .bold))
-                .foregroundColor(Color(red: 0.4, green: 0.49, blue: 0.92))
+                .foregroundColor(Color.brandPrimary)
             Text(label)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(.secondary)
@@ -124,17 +104,13 @@ private struct PremiumBanner: View {
     @State private var sparkleAnimation = false
     
     private var bannerGradient: LinearGradient {
-        LinearGradient(
-            colors: [Color(red: 0.4, green: 0.49, blue: 0.92), Color(red: 0.46, green: 0.29, blue: 0.71)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        LinearGradient.brandPrimary
     }
     
     private var bannerBackground: some View {
         RoundedRectangle(cornerRadius: 20)
             .fill(bannerGradient)
-            .shadow(color: Color(red: 0.4, green: 0.49, blue: 0.92).opacity(0.3), radius: 16, x: 0, y: 8)
+            .shadow(color: Color.brandPrimary.opacity(0.3), radius: 16, x: 0, y: 8)
     }
     
     private var sparkleIcon: some View {
@@ -170,13 +146,13 @@ private struct PremiumBanner: View {
             // TODO: Implement navigation to upgrade view
         }
         .font(.system(size: 16, weight: .semibold))
-        .foregroundColor(Color(red: 0.4, green: 0.49, blue: 0.92))
+        .foregroundColor(Color.brandPrimary)
         .padding(.horizontal, 24)
         .padding(.vertical, 12)
         .background(
             Capsule()
                 .fill(Color.white)
-                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                .shadow(color: Color.shadowMedium, radius: 4, x: 0, y: 2)
         )
     }
     
@@ -198,14 +174,7 @@ struct ProfileView: View {
     @EnvironmentObject private var router: RouterPath
     
     private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            colors: [
-                Color(red: 0.96, green: 0.96, blue: 0.97),
-                Color(red: 0.94, green: 0.94, blue: 0.96)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
+        LinearGradient.backgroundProfile
     }
 
     var body: some View {
@@ -262,17 +231,12 @@ struct ProfileView: View {
     }
 
     private var profileCard: some View {
-        GlassMorphismCard {
-            profileCardContent
-        }
+        profileCardContent
+            .glassCard(cornerRadius: 25)
     }
     
     private var avatarGradient: LinearGradient {
-        LinearGradient(
-            colors: [Color(red: 0.4, green: 0.49, blue: 0.92), Color(red: 0.46, green: 0.29, blue: 0.71)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        LinearGradient.brandPrimary
     }
     
     private var avatar: some View {
@@ -280,7 +244,7 @@ struct ProfileView: View {
             Circle()
                 .fill(avatarGradient)
                 .frame(width: 80, height: 80)
-                .shadow(color: Color(red: 0.4, green: 0.49, blue: 0.92).opacity(0.3), radius: 10, x: 0, y: 5)
+                .shadow(color: Color.brandPrimary.opacity(0.3), radius: 10, x: 0, y: 5)
             
             Text("👤")
                 .font(.system(size: 32))
@@ -315,11 +279,7 @@ struct ProfileView: View {
     }
     
     private var topGradientLine: some View {
-        LinearGradient(
-            colors: [Color(red: 0.4, green: 0.49, blue: 0.92), Color(red: 0.46, green: 0.29, blue: 0.71)],
-            startPoint: .leading,
-            endPoint: .trailing
-        )
+        LinearGradient.brandPrimary
         .frame(height: 4)
         .clipShape(RoundedRectangle(cornerRadius: 2))
     }
@@ -343,14 +303,14 @@ struct ProfileView: View {
             VStack(spacing: 0) {
                 ProfileMenuRow(
                     icon: "⭐",
-                    colors: [Color(red: 1.0, green: 0.4, blue: 0.6), Color(red: 1.0, green: 0.58, blue: 0.0)],
+                    colors: [Color.accentPink, Color.warning],
                     title: "Upgrade to Pro",
                     subtitle: "Unlock premium features"
                 ) {
                     router.navigate(to: .upgradeView)
                 }
             }
-            .background(sectionBackground)
+            .sectionBackground()
         }
     }
 
@@ -361,7 +321,7 @@ struct ProfileView: View {
             VStack(spacing: 0) {
                 ProfileMenuRow(
                     icon: "🐦",
-                    colors: [Color(red: 0.3, green: 0.85, blue: 0.8), Color(red: 0.27, green: 0.63, blue: 0.55)],
+                    colors: [Color.accentTeal, Color.accentTealSecondary],
                     title: "Follow us on X",
                     subtitle: "Stay updated with latest features"
                 ) {
@@ -370,7 +330,7 @@ struct ProfileView: View {
                 
                 ProfileMenuRow(
                     icon: "❓",
-                    colors: [Color(red: 0.27, green: 0.71, blue: 0.82), Color(red: 0.59, green: 0.79, blue: 0.24)],
+                    colors: [Color.accentCyan, Color.accentGreen],
                     title: "Help Center",
                     subtitle: "Get support and answers"
                 ) {
@@ -379,7 +339,7 @@ struct ProfileView: View {
                 
                 ProfileMenuRow(
                     icon: "🔐",
-                    colors: [Color(red: 0.94, green: 0.58, blue: 0.98), Color(red: 0.96, green: 0.34, blue: 0.43)],
+                    colors: [Color.accentPurple, Color.accentPurpleSecondary],
                     title: "Privacy Policy",
                     subtitle: "How we protect your data"
                 ) {
@@ -388,14 +348,14 @@ struct ProfileView: View {
                 
                 ProfileMenuRow(
                     icon: "📋",
-                    colors: [Color(red: 0.31, green: 0.68, blue: 1.0), Color(red: 0.0, green: 0.95, blue: 1.0)],
+                    colors: [Color.accentSkyBlue, Color.accentAqua],
                     title: "Terms of Use",
                     subtitle: "Terms and conditions"
                 ) {
                     router.navigate(to: .termsView)
                 }
             }
-            .background(sectionBackground)
+            .sectionBackground()
         }
     }
     
@@ -407,15 +367,6 @@ struct ProfileView: View {
             .padding(.bottom, 16)
     }
     
-    private var sectionBackground: some View {
-        RoundedRectangle(cornerRadius: 20)
-            .fill(Color.white)
-            .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.gray.opacity(0.08), lineWidth: 1)
-            )
-    }
 }
 
 #Preview {

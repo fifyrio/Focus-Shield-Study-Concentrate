@@ -1,40 +1,5 @@
 import SwiftUI
 
-private struct GlassMorphismCard<Content: View>: View {
-    let content: Content
-    
-    init(@ViewBuilder content: () -> Content) {
-        self.content = content()
-    }
-    
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 24)
-            .fill(Color.white.opacity(0.95))
-            .background(
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(.ultraThinMaterial)
-            )
-    }
-    
-    private var cardShadows: some View {
-        cardBackground
-            .shadow(color: .black.opacity(0.12), radius: 32, x: 0, y: 8)
-            .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
-    }
-    
-    private var cardBorder: some View {
-        RoundedRectangle(cornerRadius: 24)
-            .stroke(Color.white.opacity(0.2), lineWidth: 1)
-    }
-    
-    var body: some View {
-        content
-            .background(
-                cardShadows
-                    .overlay(cardBorder)
-            )
-    }
-}
 
 private struct StatItem: View {
     var value: String
@@ -42,10 +7,10 @@ private struct StatItem: View {
     
     private var statBackground: some View {
         RoundedRectangle(cornerRadius: 16)
-            .fill(Color(red: 0.4, green: 0.49, blue: 0.92).opacity(0.08))
+            .fill(Color.brandPrimary.opacity(0.08))
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color(red: 0.4, green: 0.49, blue: 0.92).opacity(0.1), lineWidth: 1)
+                    .stroke(Color.brandPrimary.opacity(0.1), lineWidth: 1)
             )
     }
     
@@ -53,7 +18,7 @@ private struct StatItem: View {
         VStack(spacing: 4) {
             Text(value)
                 .font(.system(size: 24, weight: .bold))
-                .foregroundColor(Color(red: 0.4, green: 0.49, blue: 0.92))
+                .foregroundColor(Color.brandPrimary)
                 .tracking(-0.3)
             Text(label)
                 .font(.system(size: 13, weight: .medium))
@@ -234,13 +199,13 @@ private struct DeckCard: View {
     
     private var cardShadows: some View {
         cardBaseBackground
-            .shadow(color: .black.opacity(0.08), radius: 25, x: 0, y: 8)
-            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 3)
+            .shadow(color: Color.shadowMedium, radius: 25, x: 0, y: 8)
+            .shadow(color: Color.shadowMedium, radius: 8, x: 0, y: 3)
     }
     
     private var cardBorder: some View {
         RoundedRectangle(cornerRadius: 20)
-            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+            .stroke(Color.glassBorderStrong, lineWidth: 1)
     }
     
     private var hoverOverlay: some View {
@@ -294,48 +259,12 @@ struct DecksView: View {
     @State private var showingDeckEdit = false
     @State private var editingDeck: Deck? = nil
     
-    // Extract complex gradient background
     private func backgroundGradient(geometry: GeometryProxy) -> some View {
-        LinearGradient(
-            colors: [
-                Color(red: 0.4, green: 0.49, blue: 0.92),
-                Color(red: 0.46, green: 0.29, blue: 0.71),
-                Color(red: 0.4, green: 0.49, blue: 0.92)
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        .overlay(radialOverlay1(geometry: geometry))
-        .overlay(radialOverlay2(geometry: geometry))
-        .overlay(radialOverlay3(geometry: geometry))
+        LinearGradient.backgroundShield
+        .overlay(RadialGradient.whiteOverlay(center: UnitPoint(x: 0.2, y: 0.2), radius: geometry.size.width * 0.5))
+        .overlay(RadialGradient.mediumWhiteOverlay(center: UnitPoint(x: 0.8, y: 0.4), radius: geometry.size.width * 0.5))
+        .overlay(RadialGradient.lightWhiteOverlay(center: UnitPoint(x: 0.4, y: 0.8), radius: geometry.size.width * 0.5))
         .ignoresSafeArea()
-    }
-    
-    private func radialOverlay1(geometry: GeometryProxy) -> some View {
-        RadialGradient(
-            colors: [Color.white.opacity(0.1), Color.clear],
-            center: UnitPoint(x: 0.2, y: 0.2),
-            startRadius: 0,
-            endRadius: geometry.size.width * 0.5
-        )
-    }
-    
-    private func radialOverlay2(geometry: GeometryProxy) -> some View {
-        RadialGradient(
-            colors: [Color.white.opacity(0.08), Color.clear],
-            center: UnitPoint(x: 0.8, y: 0.4),
-            startRadius: 0,
-            endRadius: geometry.size.width * 0.5
-        )
-    }
-    
-    private func radialOverlay3(geometry: GeometryProxy) -> some View {
-        RadialGradient(
-            colors: [Color.white.opacity(0.06), Color.clear],
-            center: UnitPoint(x: 0.4, y: 0.8),
-            startRadius: 0,
-            endRadius: geometry.size.width * 0.5
-        )
     }
 
     var body: some View {
@@ -394,28 +323,19 @@ struct DecksView: View {
     }
 
     private var statsBar: some View {
-        GlassMorphismCard {
-            HStack(spacing: 20) {
-                StatItem(value: "\(viewModel.decks.count)", label: "Decks")
-                StatItem(value: viewModel.formattedTotalCards, label: "Cards")
-                StatItem(value: viewModel.formattedStreak, label: "Streak")
-            }
-            .padding(24)
+        HStack(spacing: 20) {
+            StatItem(value: "\(viewModel.decks.count)", label: "Decks")
+            StatItem(value: viewModel.formattedTotalCards, label: "Cards")
+            StatItem(value: viewModel.formattedStreak, label: "Streak")
         }
-    }
-    
-    private var addButtonGradient: LinearGradient {
-        LinearGradient(
-            colors: [Color(red: 0.0, green: 0.48, blue: 1.0), Color(red: 0.35, green: 0.34, blue: 0.84)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        .padding(24)
+        .glassCard()
     }
     
     private var addButtonBackground: some View {
         Circle()
-            .fill(addButtonGradient)
-            .shadow(color: Color(red: 0.0, green: 0.48, blue: 1.0).opacity(0.3), radius: 12, x: 0, y: 4)
+            .fill(LinearGradient.addButton)
+            .shadow(color: Color.accentBlue.opacity(0.3), radius: 12, x: 0, y: 4)
     }
     
     private var sectionHeader: some View {
