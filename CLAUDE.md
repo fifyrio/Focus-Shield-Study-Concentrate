@@ -42,6 +42,21 @@ Focus Shield is an iOS application built with SwiftUI that combines focus/produc
   `swiftlint autocorrect --path MyApp/`
   遵循 `.swiftlint.yml` 中的规则
 
+## Auto-commit Workflow
+
+IMPORTANT: After successfully completing any development task, Claude should ALWAYS:
+
+1. **Build Verification**: Run the build command to ensure code compiles successfully
+2. **Auto-commit on Success**: If build succeeds, automatically commit changes with descriptive message
+3. **Commit Message Format**: Use clear, concise messages describing what was implemented/fixed
+
+### Auto-commit Rules:
+- Always run build command first: `cd codes/focusSheid && xcodebuild -scheme focusSheid -sdk iphonesimulator clean build`
+- If build succeeds (exit code 0), automatically run: `git add . && git commit -m "[descriptive message]"`
+- Use present tense in commit messages (e.g. "Add dark mode toggle", "Fix navigation bug")
+- Never commit if build fails - fix issues first
+- Include both what was changed and why in commit messages
+
 ### Project Structure
 - **Main app entry**: `codes/focusSheid/focusSheid/focusSheidApp.swift`
 - **Root view**: `codes/focusSheid/focusSheid/ContentView.swift` - TabView with 4 main sections
